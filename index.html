@@ -366,7 +366,7 @@
             <span>Add Expense</span>
           </button>
 
-          <label class="flex cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-emerald-200 bg-white px-3.5 py-3 text-xs font-bold text-emerald-700 shadow-xs transition hover:bg-emerald-50 active:scale-95">
+          <label class="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-white px-3.5 py-3 text-xs font-bold text-emerald-700 shadow-xs transition hover:bg-emerald-50 active:scale-95">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
@@ -505,7 +505,7 @@
           <div class="grid grid-cols-3 gap-2">
             <div>
               <label class="mb-1 block text-[10px] font-semibold text-slate-500">Balance (₹)</label>
-              <input id="loanPrincipal" type="number" min="100" step="100" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
+              <input id="loanPrincipal" type="number" inputmode="numeric" min="1" step="1" required placeholder="e.g. 2800000" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
             </div>
             <div>
               <label class="mb-1 block text-[10px] font-semibold text-slate-500">Rate (% p.a.)</label>
@@ -513,7 +513,7 @@
             </div>
             <div>
               <label class="mb-1 block text-[10px] font-semibold text-slate-500">EMI (₹/mo)</label>
-              <input id="loanEmi" type="number" min="100" step="100" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
+              <input id="loanEmi" type="number" inputmode="numeric" min="1" step="1" required placeholder="e.g. 10105" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
             </div>
           </div>
           <button type="submit" class="w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700">Save Loan</button>
@@ -811,7 +811,7 @@
       'Transport': '#d97706',             // Amber
       'Medical & Insurance': '#0d9488',   // Teal
       'Dining & Subscriptions': '#ea580c',// Orange
-      'Shopping & Misc': '#64748b'        // Slate
+      'Shopping & Misc': '#64748b'               // Slate
     };
 
     const MEMBER_BADGE_COLORS = [
@@ -1661,7 +1661,7 @@
         const col = CATEGORY_COLORS[t.category] || '#64748b';
         const memName = state.members[t.memberIdx] || 'Family';
         return `
-          <div class="flex items-center justify-between gap-2.5 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xs">
+          <div class="flex items-center justify-between gap-2.5 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs">
             <div class="flex items-center gap-2.5 min-w-0">
               <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-extrabold" style="background:${col}18; color:${col}">
                 ${t.category.slice(0, 2).toUpperCase()}
@@ -1916,7 +1916,7 @@
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
                 <h4 class="truncate text-xs font-bold text-slate-900">${escapeHtml(l.name)}</h4>
-                <span class="rounded-md px-1.5 py-0.5 text-[10px] font-bold ${l.rate >= 12 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}">${l.rate}%</span>
+                <span class="rounded-md px-1.5 py-0.5 text-[10px] font-bold ${l.rate >= 12 ? 'bg-rose-100 text-rose-700' : 'bg-slate-200 text-slate-600'}">${l.rate}%</span>
               </div>
               <p class="mt-1 text-[11px] text-slate-500">Bal: <strong class="text-slate-900">${formatINR(l.principal)}</strong> • EMI: <strong class="text-rose-600">${formatINR(l.emi)}/mo</strong></p>
             </div>
@@ -1924,7 +1924,7 @@
               <button type="button" onclick="editLoan('${l.id}')" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-emerald-50 hover:text-emerald-700">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
+              </svg>
               </button>
               <button type="button" onclick="deleteLoan('${l.id}')" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -2047,7 +2047,7 @@
       if (loanPayoffChart) loanPayoffChart.destroy();
       loanPayoffChart = new Chart(ctx, {
         type: 'line',
-        data: {
+               data: {
           labels,
           datasets: [
             { label: 'Current EMIs', data: basePts, borderColor: '#94a3b8', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.25 },

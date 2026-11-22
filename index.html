@@ -41,6 +41,9 @@
 
   <!-- Chart.js via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- PDF and spreadsheet support for on-device statement imports -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     html, body {
@@ -354,7 +357,7 @@
         </div>
       </section>
 
-      <!-- ==================== TAB 3: EXPENSES & CSV IMPORT ==================== -->
+      <!-- ==================== TAB 3: EXPENSES & STATEMENT IMPORT ==================== -->
       <section id="tab-expenses" class="tab-pane hidden space-y-3.5">
 
         <!-- Quick Actions -->
@@ -370,18 +373,18 @@
             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
-            <span>Import CSV</span>
-            <input id="csvFileInput" type="file" accept=".csv,text/csv" class="hidden" />
+            <span>Import Statement</span>
+            <input id="csvFileInput" type="file" accept=".csv,.tsv,.txt,.pdf,.xls,.xlsx,.ofx,.qfx,text/csv,text/plain,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-ofx,application/ofx" class="hidden" />
           </label>
         </div>
 
-        <!-- Private CSV Dropzone & Sample Download -->
+        <!-- Private Statement Dropzone & Sample Download -->
         <div id="csvDropZone" class="flex items-center justify-between gap-2 rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/60 px-3.5 py-2.5 text-[11px] text-emerald-900 transition">
           <div class="flex items-center gap-2">
             <svg class="h-4 w-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span>Drop bank CSV here • Parsed 100% on-device</span>
+            <span>Drop PDF, CSV, Excel or OFX • Parsed 100% on-device</span>
           </div>
           <button id="downloadSampleCsvBtn" type="button" class="shrink-0 font-bold text-emerald-700 underline underline-offset-2">Sample CSV</button>
         </div>
@@ -1626,7 +1629,7 @@
       showToast('Recurring bill added!', 'success');
     });
 
-    // ==================== TAB 3: EXPENSES & PRIVATE CSV IMPORT ====================
+    // ==================== TAB 3: EXPENSES & PRIVATE STATEMENT IMPORT ====================
     function renderExpensesTab() {
       const search = document.getElementById('txSearch').value.trim().toLowerCase();
       const memFilter = document.getElementById('filterMember').value;
@@ -1651,7 +1654,7 @@
         container.innerHTML = `
           <div class="rounded-3xl border border-dashed border-slate-200 bg-white p-7 text-center">
             <p class="text-xs font-bold text-slate-600">No expenses logged for ${formatMonthLabel(state.activeMonth)}</p>
-            <p class="mt-1 text-[11px] text-slate-400">Tap "+ Add Expense" or import a bank statement CSV.</p>
+            <p class="mt-1 text-[11px] text-slate-400">Tap "+ Add Expense" or import a bank statement.</p>
           </div>
         `;
         return;
@@ -1745,7 +1748,7 @@
       document.getElementById(id).addEventListener('change', renderExpensesTab);
     });
 
-    // Private On-Device Bank Statement CSV Parser
+    // Private On-Device Bank Statement Parser
     function autoCategorizeIndianTx(desc) {
       const d = (desc || '').toLowerCase();
       if (/(swiggy|zomato|dominos|starbucks|cafe|restaurant|netflix|hotstar|spotify|prime|dining)/.test(d)) return 'Dining & Subscriptions';
@@ -1782,74 +1785,186 @@
       return `${state.activeMonth}-15`;
     }
 
-    function handleCsvFile(file) {
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const lines = (ev.target.result || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-          if (lines.length < 2) return showToast('CSV file is empty', 'error');
+    function parseStatementMatrix(lines) {
+      if (!lines || lines.length < 2) return 0;
 
-          let hIdx = 0;
-          for (let i = 0; i < Math.min(8, lines.length); i++) {
-            const lo = lines[i].toLowerCase();
-            if (lo.includes('date') && (lo.includes('debit') || lo.includes('withdraw') || lo.includes('amount') || lo.includes('narration') || lo.includes('description'))) {
-              hIdx = i;
-              break;
-            }
-          }
-
-          const headers = parseCsvLine(lines[hIdx]).map(h => h.toLowerCase());
-          const dateCol = headers.findIndex(h => h.includes('date'));
-          const descCol = headers.findIndex(h => h.includes('narrat') || h.includes('desc') || h.includes('partic') || h.includes('remark'));
-          const debitCol = headers.findIndex(h => h.includes('debit') || h.includes('withdraw') || h.includes('dr'));
-          const amountCol = headers.findIndex(h => h.includes('amount'));
-
-          let count = 0;
-          let lastMonthImported = state.activeMonth;
-
-          for (let i = hIdx + 1; i < lines.length; i++) {
-            const cols = parseCsvLine(lines[i]);
-            if (cols.length < 2) continue;
-            const rawAmtStr = debitCol >= 0 ? cols[debitCol] : (amountCol >= 0 ? cols[amountCol] : '');
-            const amt = Math.abs(parseFloat((rawAmtStr || '').replace(/[₹$,\s"]/g, '')) || 0);
-            if (amt <= 0) continue;
-
-            const dateStr = normalizeDate(dateCol >= 0 ? cols[dateCol] : cols[0]);
-            const mKey = dateStr.slice(0, 7);
-            const desc = (descCol >= 0 ? cols[descCol] : cols[1]) || 'Bank Debit';
-
-            state.transactions.unshift({
-              id: `csv_${Date.now()}_${i}`,
-              monthKey: mKey,
-              date: dateStr,
-              amount: Math.round(amt),
-              category: autoCategorizeIndianTx(desc),
-              memberIdx: 0,
-              note: desc.slice(0, 70),
-              paymentMode: desc.toLowerCase().includes('upi') ? 'UPI' : 'Bank'
-            });
-            lastMonthImported = mKey;
-            count++;
-          }
-
-          if (count > 0) {
-            state.activeMonth = lastMonthImported;
-            saveState();
-            refreshActiveTab();
-            showToast(`Imported ${count} expenses privately!`, 'success');
-          } else {
-            showToast('No debit rows found in CSV', 'error');
-          }
-        } catch (err) {
-          showToast('Failed to parse CSV', 'error');
+      let hIdx = 0;
+      for (let i = 0; i < Math.min(12, lines.length); i++) {
+        const lo = lines[i].join(' ').toLowerCase();
+        if (lo.includes('date') && (
+          lo.includes('debit') || lo.includes('withdraw') || lo.includes('amount') ||
+          lo.includes('narrat') || lo.includes('desc') || lo.includes('partic')
+        )) {
+          hIdx = i;
+          break;
         }
-      };
-      reader.readAsText(file);
+      }
+
+      const headers = lines[hIdx].map(h => String(h || '').trim().toLowerCase());
+      const dateCol = headers.findIndex(h => h.includes('date'));
+      const descCol = headers.findIndex(h => h.includes('narrat') || h.includes('desc') || h.includes('partic') || h.includes('remark') || h.includes('details'));
+      const debitCol = headers.findIndex(h => h.includes('debit') || h.includes('withdraw') || h.includes('dr'));
+      const creditCol = headers.findIndex(h => h.includes('credit') || h.includes('deposit') || h.includes('cr'));
+      const amountCol = headers.findIndex(h => h.includes('amount') || h.includes('transaction'));
+
+      let count = 0;
+      let lastMonthImported = state.activeMonth;
+      for (let i = hIdx + 1; i < lines.length; i++) {
+        const cols = lines[i].map(v => String(v ?? '').trim());
+        if (cols.length < 2) continue;
+
+        let rawAmtStr = debitCol >= 0 ? cols[debitCol] : '';
+        if (!rawAmtStr && creditCol >= 0) {
+          if (!(cols[creditCol] || '').trim()) rawAmtStr = amountCol >= 0 ? cols[amountCol] : '';
+        }
+        if (!rawAmtStr && amountCol >= 0) rawAmtStr = cols[amountCol];
+
+        if (creditCol >= 0 && (cols[creditCol] || '').trim() && !rawAmtStr) continue;
+        const amt = Math.abs(parseFloat((rawAmtStr || '').replace(/[₹$,\s"]/g, '')) || 0);
+        if (amt <= 0) continue;
+
+        const dateStr = normalizeDate(dateCol >= 0 ? cols[dateCol] : cols[0]);
+        const desc = (descCol >= 0 ? cols[descCol] : cols.slice(1).find(v => /[A-Za-z]/.test(v))) || 'Bank Debit';
+        const mKey = dateStr.slice(0, 7);
+
+        state.transactions.unshift({
+          id: `statement_${Date.now()}_${i}`,
+          monthKey: mKey,
+          date: dateStr,
+          amount: Math.round(amt),
+          category: autoCategorizeIndianTx(desc),
+          memberIdx: 0,
+          note: desc.slice(0, 70),
+          paymentMode: desc.toLowerCase().includes('upi') ? 'UPI' : 'Bank'
+        });
+        lastMonthImported = mKey;
+        count++;
+      }
+      if (count > 0) state.activeMonth = lastMonthImported;
+      return count;
+    }
+
+    function parseTextStatement(text) {
+      const lines = (text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const dateRegex = /\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2})\b/;
+      const rows = [];
+
+      lines.forEach(line => {
+        const dateMatch = line.match(dateRegex);
+        if (!dateMatch) return;
+        const lower = line.toLowerCase();
+        if (/\b(credit|cr\b|deposited|received)\b/.test(lower) && !/\b(debit|dr\b|withdrawn|paid)\b/.test(lower)) return;
+
+        const amounts = (line.match(/(?:₹|INR|Rs\.?\s*)?[+-]?\(?[\d,]+(?:\.\d{1,2})?\)?/gi) || [])
+          .map(v => v.replace(/[₹|INR|Rs.,()+\s]/gi, '').replace(/,/g, ''))
+          .filter(v => /^\d+(?:\.\d{1,2})?$/.test(v));
+        if (!amounts.length) return;
+        const amount = amounts.slice().reverse().find(v => parseFloat(v) > 0);
+        if (!amount) return;
+        const desc = line.replace(dateMatch[0], '').replace(amount, '').replace(/[₹|:]/g, '').trim() || 'Bank Debit';
+        rows.push([dateMatch[0], desc, amount]);
+      });
+
+      if (!rows.length) return 0;
+      rows.unshift(['Date', 'Narration', 'Debit']);
+      return parseStatementMatrix(rows);
+    }
+
+    function parseOfx(text) {
+      const rows = [];
+      const transactionRegex = /<STMTTRN>([\s\S]*?)(?=<\/STMTTRN>|<STMTTRN>|$)/gi;
+      let match;
+      while ((match = transactionRegex.exec(text)) !== null) {
+        const block = match[1];
+        const field = tag => (block.match(new RegExp(`<${tag}>([^<\\r\\n]+)`, 'i')) || ['', ''])[1].trim();
+        const amount = parseFloat(field('TRNAMT'));
+        if (!amount || amount >= 0) continue;
+        const posted = field('DTPOSTED').slice(0, 8);
+        const date = posted.length === 8
+          ? `${posted.slice(0, 4)}-${posted.slice(4, 6)}-${posted.slice(6, 8)}`
+          : `${state.activeMonth}-15`;
+        rows.push([date, field('NAME') || field('MEMO') || 'Bank Debit', Math.abs(amount).toFixed(2)]);
+      }
+      if (!rows.length) return 0;
+      rows.unshift(['Date', 'Narration', 'Debit']);
+      return parseStatementMatrix(rows);
+    }
+
+    async function handlePdfFile(file) {
+      if (!window.pdfjsLib) window.pdfjsLib = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.mjs');
+      const pdfjsLib = window.pdfjsLib;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.mjs';
+      const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+      let text = '';
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const content = await page.getTextContent();
+        let lastY = null;
+        let line = '';
+        content.items.forEach(item => {
+          const y = Math.round(item.transform[5]);
+          if (lastY !== null && Math.abs(y - lastY) > 3) {
+            text += line.trim() + '\n';
+            line = '';
+          }
+          line += (line && item.str.trim() ? ' ' : '') + item.str.trim();
+          lastY = y;
+        });
+        if (line.trim()) text += line.trim() + '\n';
+      }
+      return parseTextStatement(text);
+    }
+
+    async function handleSpreadsheetFile(file) {
+      if (!window.XLSX) throw new Error('Spreadsheet support unavailable');
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true });
+      let count = 0;
+      for (const sheetName of workbook.SheetNames) {
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, raw: false, defval: '' });
+        count += parseStatementMatrix(rows);
+      }
+      return count;
+    }
+
+    async function handleStatementFile(file) {
+      if (!file) return;
+      const name = (file.name || '').toLowerCase();
+      try {
+        let count = 0;
+        if (/\.pdf$/.test(name)) {
+          showToast('Reading PDF on-device…');
+          count = await handlePdfFile(file);
+        } else if (/\.xlsx?$/.test(name)) {
+          showToast('Reading spreadsheet on-device…');
+          count = await handleSpreadsheetFile(file);
+        } else {
+          const text = await file.text();
+          if (/\.ofx$|\.qfx$/.test(name) || /\b(?:OFXHEADER|STMTTRN)\b/i.test(text)) {
+            count = parseOfx(text);
+          } else if (text.includes(',') || text.includes('\t')) {
+            const lines = text.split(/\r?\n/).filter(Boolean).map(line =>
+              line.includes('\t') ? line.split('\t').map(v => v.trim()) : parseCsvLine(line)
+            );
+            count = parseStatementMatrix(lines);
+          } else {
+            count = parseTextStatement(text);
+          }
+        }
+        if (count > 0) {
+          saveState();
+          refreshActiveTab();
+          showToast(`Imported ${count} expenses privately!`, 'success');
+        } else {
+          showToast('No debit transactions found. PDF statements should be text-based, not only scanned images.', 'error');
+        }
+      } catch (err) {
+        console.error('Statement import failed:', err);
+        showToast('Could not read this statement format', 'error');
+      }
     }
 
     document.getElementById('csvFileInput').addEventListener('change', (e) => {
-      handleCsvFile(e.target.files?.[0]);
+      handleStatementFile(e.target.files?.[0]);
       e.target.value = '';
     });
 
@@ -1859,7 +1974,7 @@
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('bg-emerald-100');
-      handleCsvFile(e.dataTransfer.files?.[0]);
+      handleStatementFile(e.dataTransfer.files?.[0]);
     });
 
     document.getElementById('downloadSampleCsvBtn').addEventListener('click', () => {

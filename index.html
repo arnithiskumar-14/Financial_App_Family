@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#059669" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="ParivarVault Pro" />
+  <title>ParivarVault Pro — Family Financial OS</title>
+
+  <!-- Inline SVG App Icon & Apple Touch Icon for iOS/Android Home Screen -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%23059669'/%3E%3Cpath d='M64 24L98 38V62C98 84 83 101 64 108C45 101 30 84 30 62V38L64 24Z' fill='none' stroke='white' stroke-width='7' stroke-linejoin='round'/%3E%3Cpath d='M50 52H78M50 63H78M68 52C68 62 60 69 50 69L74 88' fill='none' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23059669'/%3E%3Cpath d='M90 34L138 54V88C138 119 117 143 90 152C63 143 42 119 42 88V54L90 34Z' fill='none' stroke='white' stroke-width='10' stroke-linejoin='round'/%3E%3Cpath d='M70 74H110M70 90H110M96 74C96 88 84 98 70 98L104 125' fill='none' stroke='white' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+
+  <!-- Inline Web App Manifest for PWA Installation -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"ParivarVault Pro — Family Financial OS","short_name":"ParivarVault","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#059669","orientation":"portrait"}' />
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 2px 16px -2px rgba(15, 23, 42, 0.06)',
+            'nav': '0 -4px 20px -4px rgba(15, 23, 42, 0.08)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Touch-friendly range slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: #059669;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.45);
+      margin-top: -8px;
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(1.15);
+    }
+
+    .tab-pane {
+      animation: fadeSlide 0.2s ease-out;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pb-safe {
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.4rem);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 antialiased selection:bg-emerald-100 selection:text-emerald-900">
+
+  <!-- ==================== PIN LOCK SCREEN OVERLAY ==================== -->
+  <div id="pinLockOverlay" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-slate-950/95 px-6 text-white backdrop-blur-md">
+    <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-600/30">
+      <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    </div>
+    <h2 class="text-lg font-bold tracking-tight">ParivarVault Pro Locked</h2>
+    <p id="pinErrorMsg" class="mt-1 h-4 text-xs font-medium text-slate-400">Enter your 4-digit family PIN</p>
+
+    <!-- 4 PIN Dots -->
+    <div id="pinDots" class="my-6 flex items-center gap-4">
+      <span class="pin-dot h-3.5 w-3.5 rounded-full border-2 border-slate-500 transition-all"></span>
+      <span class="pin-dot h-3.5 w-3.5 rounded-full border-2 border-slate-500 transition-all"></span>
+      <span class="pin-dot h-3.5 w-3.5 rounded-full border-2 border-slate-500 transition-all"></span>
+      <span class="pin-dot h-3.5 w-3.5 rounded-full border-2 border-slate-500 transition-all"></span>
+    </div>
+
+    <!-- Keypad -->
+    <div class="grid w-full max-w-[260px] grid-cols-3 gap-3">
+      <button type="button" data-pin="1" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">1</button>
+      <button type="button" data-pin="2" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">2</button>
+      <button type="button" data-pin="3" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">3</button>
+      <button type="button" data-pin="4" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">4</button>
+      <button type="button" data-pin="5" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">5</button>
+      <button type="button" data-pin="6" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">6</button>
+      <button type="button" data-pin="7" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">7</button>
+      <button type="button" data-pin="8" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">8</button>
+      <button type="button" data-pin="9" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">9</button>
+      <button type="button" id="pinClearBtn" class="h-14 rounded-2xl bg-slate-900/70 text-xs font-semibold text-slate-400 transition active:scale-95">Clear</button>
+      <button type="button" data-pin="0" class="pin-key h-14 rounded-2xl bg-slate-800/90 text-xl font-bold text-white transition active:scale-95 active:bg-emerald-600">0</button>
+      <button type="button" id="pinBackBtn" class="flex h-14 items-center justify-center rounded-2xl bg-slate-900/70 text-slate-300 transition active:scale-95">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN MOBILE APP SHELL ==================== -->
+  <div class="relative mx-auto flex min-h-screen max-w-md flex-col bg-slate-50 shadow-2xl sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:overflow-hidden sm:rounded-[2rem] sm:border sm:border-slate-200/80">
+
+    <!-- Sticky Top Header -->
+    <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 px-3.5 py-2.5 backdrop-blur-md">
+      <div class="flex items-center justify-between gap-2">
+        <!-- Brand -->
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9h5M9.5 12h5M13.5 9c0 1.8-1.5 3-3.5 3l3.5 4" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <h1 class="truncate text-sm font-extrabold tracking-tight text-slate-900 leading-none">ParivarVault <span class="text-emerald-600">Pro</span></h1>
+            <p class="mt-0.5 text-[10px] font-medium text-slate-400 leading-none">100% Private • Local OS</p>
+          </div>
+        </div>
+
+        <!-- Right Controls: Quick PIN Lock + Settings -->
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button id="quickLockBtn" type="button" aria-label="Lock App" title="Quick PIN Lock" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 active:scale-95">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </button>
+          <button id="openSettingsBtn" type="button" aria-label="Settings & Sync" title="Settings & Family Sync" class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 active:scale-95">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Month Switcher Bar -->
+      <div class="mt-2 flex items-center justify-between rounded-xl bg-slate-100/90 px-1.5 py-1">
+        <button id="prevMonthBtn" type="button" aria-label="Previous Month" class="flex h-7 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-white hover:text-slate-900 active:scale-95">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div class="flex items-center gap-1.5">
+          <span id="activeMonthLabel" class="text-xs font-bold tracking-wide text-slate-800">Nov 2026</span>
+          <span id="currentMonthDot" class="hidden rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-emerald-700">Now</span>
+        </div>
+        <button id="nextMonthBtn" type="button" aria-label="Next Month" class="flex h-7 w-8 items-center justify-center rounded-lg text-slate-600 transition hover:bg-white hover:text-slate-900 active:scale-95">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Content -->
+    <main class="flex-1 overflow-y-auto px-3.5 pb-24 pt-3.5">
+
+      <!-- ==================== TAB 1: OVERVIEW ==================== -->
+      <section id="tab-overview" class="tab-pane space-y-3.5">
+
+        <!-- Financial Health Score Card -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 p-4 text-white shadow-lg">
+          <div class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-500/20 blur-2xl"></div>
+          <div class="relative flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-300">Financial Health Score</p>
+              <div class="mt-1 flex items-baseline gap-2">
+                <span id="healthScoreNumber" class="text-3xl font-extrabold tracking-tight text-white">0</span>
+                <span class="text-xs font-medium text-slate-400">/ 100</span>
+                <span id="healthScoreBadge" class="ml-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">Stabilizing</span>
+              </div>
+            </div>
+            <!-- Circular Score Ring SVG -->
+            <div class="relative flex h-14 w-14 shrink-0 items-center justify-center">
+              <svg class="h-14 w-14 -rotate-90" viewBox="0 0 56 56">
+                <circle cx="28" cy="28" r="23" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="5" />
+                <circle id="healthScoreRing" cx="28" cy="28" r="23" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="144.5" style="transition: stroke-dashoffset 0.5s ease;" />
+              </svg>
+              <span id="healthScoreIcon" class="absolute text-sm font-bold text-emerald-300">★</span>
+            </div>
+          </div>
+
+          <!-- 4 Health Sub-Metrics Pills -->
+          <div id="healthSubMetrics" class="relative mt-3 grid grid-cols-4 gap-1.5 text-center"></div>
+
+          <!-- Personalized Action Tips -->
+          <div class="relative mt-3 rounded-2xl bg-white/10 p-3 backdrop-blur-xs">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-300">This Month's Action Tips</p>
+            <ul id="healthActionTips" class="mt-1.5 space-y-1.5 text-[11px] leading-snug text-slate-100"></ul>
+          </div>
+        </div>
+
+        <!-- 4-Card KPI Grid -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- Income (Tap to Edit) -->
+          <button id="editMonthIncomeBtn" type="button" class="group rounded-2xl border border-slate-200/80 bg-white p-3.5 text-left shadow-card transition hover:border-emerald-300 active:scale-[0.98]">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-500">Monthly Income</span>
+              <svg class="h-3.5 w-3.5 text-emerald-600 opacity-75 group-hover:opacity-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </div>
+            <p id="kpiIncome" class="mt-1 text-lg font-extrabold text-slate-900">₹0</p>
+            <p class="mt-0.5 text-[10px] font-medium text-emerald-600">Tap to edit for month</p>
+          </button>
+
+          <!-- Total Spent & EMIs -->
+          <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-card">
+            <span class="text-[11px] font-semibold text-slate-500">Spent & EMIs</span>
+            <p id="kpiSpent" class="mt-1 text-lg font-extrabold text-rose-600">₹0</p>
+            <p id="kpiEmiShare" class="mt-0.5 text-[10px] font-medium text-slate-400">EMIs: 0% of income</p>
+          </div>
+
+          <!-- Monthly Surplus / Deficit -->
+          <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-card">
+            <span class="text-[11px] font-semibold text-slate-500">Monthly Surplus</span>
+            <p id="kpiSurplus" class="mt-1 text-lg font-extrabold text-emerald-600">₹0</p>
+            <p id="kpiSurplusNote" class="mt-0.5 text-[10px] font-medium text-slate-400">Available to save/prepay</p>
+          </div>
+
+          <!-- Savings Rate -->
+          <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-card">
+            <span class="text-[11px] font-semibold text-slate-500">Savings Rate</span>
+            <p id="kpiSavingsRate" class="mt-1 text-lg font-extrabold text-slate-900">0%</p>
+            <p class="mt-0.5 text-[10px] font-medium text-slate-400">Target: ≥ 20%</p>
+          </div>
+        </div>
+
+        <!-- 6-Month Cashflow Trend Chart -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-2.5 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">6-Month Cashflow Trend</h3>
+              <p class="text-[11px] text-slate-500">Income vs. Expenses vs. Net Savings</p>
+            </div>
+            <span class="rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700">Live History</span>
+          </div>
+          <div class="relative h-48 w-full">
+            <canvas id="cashflowChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category Breakdown Donut Chart -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Category Breakdown</h3>
+              <p class="text-[11px] text-slate-500">Logged expenses for <span class="active-month-inline font-semibold"></span></p>
+            </div>
+          </div>
+          <div class="relative mx-auto flex h-44 w-full items-center justify-center">
+            <canvas id="categoryDonutChart"></canvas>
+            <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-[10px] font-medium text-slate-400">Total Outflow</span>
+              <span id="donutCenterTotal" class="text-sm font-extrabold text-slate-900">₹0</span>
+            </div>
+          </div>
+          <div id="donutLegend" class="mt-3.5 grid grid-cols-2 gap-1.5 text-[11px]"></div>
+        </div>
+
+        <!-- Per-Member Spending Bars -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Family Member Spending</h3>
+              <p class="text-[11px] text-slate-500">Household of 4 breakdown</p>
+            </div>
+            <button type="button" onclick="openSettingsModal()" class="text-xs font-semibold text-emerald-700 hover:underline">Edit Names</button>
+          </div>
+          <div id="memberBarsContainer" class="space-y-2.5"></div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: BUDGET & BILLS ==================== -->
+      <section id="tab-budget" class="tab-pane hidden space-y-4">
+
+        <!-- Recurring Bills & EMI Checklist -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Monthly Bills & EMIs</h3>
+              <p class="text-[11px] text-slate-500"><span id="billsSummaryText">0 of 0 paid</span> • One-tap logs expense</p>
+            </div>
+            <button id="toggleAddBillBtn" type="button" class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-700 active:scale-95">
+              + Add Bill
+            </button>
+          </div>
+
+          <!-- Add Recurring Bill Form -->
+          <form id="addBillForm" class="mb-3.5 hidden space-y-2.5 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">New Recurring Bill</span>
+              <button type="button" id="cancelBillFormBtn" class="text-[11px] font-semibold text-slate-400">Cancel</button>
+            </div>
+            <input id="billName" type="text" required placeholder="e.g. Broadband Wi-Fi, LIC Premium" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-emerald-500" />
+            <div class="grid grid-cols-3 gap-2">
+              <input id="billAmount" type="number" min="1" required placeholder="Amount ₹" class="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold outline-none focus:border-emerald-500" />
+              <input id="billDueDay" type="number" min="1" max="31" required placeholder="Due Day" class="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs outline-none focus:border-emerald-500" />
+              <select id="billCategory" class="rounded-xl border border-slate-200 bg-white px-2 py-2 text-[11px] font-medium outline-none focus:border-emerald-500"></select>
+            </div>
+            <button type="submit" class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white hover:bg-emerald-700">Save Recurring Bill</button>
+          </form>
+
+          <div id="billsListContainer" class="space-y-2"></div>
+        </div>
+
+        <!-- Monthly Category Budget Caps -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Category Budget Caps</h3>
+              <p class="text-[11px] text-slate-500">Tap any cap ₹ to edit monthly limit</p>
+            </div>
+            <span id="totalBudgetCapBadge" class="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-700">Cap: ₹0</span>
+          </div>
+          <div id="budgetCapsContainer" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: EXPENSES & CSV IMPORT ==================== -->
+      <section id="tab-expenses" class="tab-pane hidden space-y-3.5">
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <button id="toggleAddTxBtn" type="button" class="flex items-center justify-center gap-1.5 rounded-2xl bg-emerald-600 px-3.5 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 active:scale-95">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add Expense</span>
+          </button>
+
+          <label class="flex cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-emerald-200 bg-white px-3.5 py-3 text-xs font-bold text-emerald-700 shadow-xs transition hover:bg-emerald-50 active:scale-95">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Import CSV</span>
+            <input id="csvFileInput" type="file" accept=".csv,text/csv" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Private CSV Dropzone & Sample Download -->
+        <div id="csvDropZone" class="flex items-center justify-between gap-2 rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/60 px-3.5 py-2.5 text-[11px] text-emerald-900 transition">
+          <div class="flex items-center gap-2">
+            <svg class="h-4 w-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>Drop bank CSV here • Parsed 100% on-device</span>
+          </div>
+          <button id="downloadSampleCsvBtn" type="button" class="shrink-0 font-bold text-emerald-700 underline underline-offset-2">Sample CSV</button>
+        </div>
+
+        <!-- Collapsible Add Expense Form -->
+        <form id="addTxForm" class="hidden space-y-3 rounded-3xl border border-emerald-200 bg-white p-4 shadow-card">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900">Log Family Expense</h3>
+            <button type="button" id="closeAddTxBtn" class="text-xs font-semibold text-slate-400">Cancel</button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="mb-1 block text-[11px] font-semibold text-slate-600">Amount (₹)</label>
+              <input id="txAmount" type="number" min="1" step="1" required placeholder="e.g. 1850" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold outline-none focus:border-emerald-500 focus:bg-white" />
+            </div>
+            <div>
+              <label class="mb-1 block text-[11px] font-semibold text-slate-600">Date</label>
+              <input id="txDate" type="date" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="mb-1 block text-[11px] font-semibold text-slate-600">Category</label>
+              <select id="txCategory" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white"></select>
+            </div>
+            <div>
+              <label class="mb-1 block text-[11px] font-semibold text-slate-600">Family Member</label>
+              <select id="txMember" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white"></select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div class="col-span-2">
+              <label class="mb-1 block text-[11px] font-semibold text-slate-600">Note / Merchant</label>
+              <input id="txNote" type="text" required placeholder="e.g. DMart groceries, Swiggy" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs outline-none focus:border-emerald-500 focus:bg-white" />
+            </div>
+            <div>
+              <label class="mb-1 block text-[11px] font-semibold text-slate-600">Mode</label>
+              <select id="txMode" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2 py-2.5 text-xs font-semibold outline-none focus:border-emerald-500 focus:bg-white">
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+                <option value="Bank">Bank</option>
+                <option value="Cash">Cash</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700">Save Expense</button>
+        </form>
+
+        <!-- Search & Filter -->
+        <div class="space-y-2 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-card">
+          <div class="relative">
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input id="txSearch" type="text" placeholder="Search merchant, UPI, note..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-xs outline-none focus:border-emerald-500 focus:bg-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="filterMember" class="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-700 outline-none focus:border-emerald-500"></select>
+            <select id="filterCategory" class="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-medium text-slate-700 outline-none focus:border-emerald-500"></select>
+          </div>
+        </div>
+
+        <!-- Transactions List -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Transactions (<span class="active-month-inline"></span>)</h3>
+            <span id="txCountBadge" class="text-xs font-bold text-slate-600">0 items</span>
+          </div>
+          <div id="txListContainer" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: LOANS & DEBT FREEDOM ==================== -->
+      <section id="tab-loans" class="tab-pane hidden space-y-3.5">
+
+        <!-- Debt KPI Strip -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="rounded-2xl border border-rose-100 bg-gradient-to-br from-rose-50 to-white p-3.5 shadow-card">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-rose-500">Total Principal</p>
+            <p id="totalDebtPrincipal" class="mt-1 text-lg font-extrabold text-slate-900">₹0</p>
+            <p id="avgLoanRate" class="mt-0.5 text-[10px] font-medium text-slate-500">Weighted avg: 0%</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-card">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Monthly EMI</p>
+            <p id="totalMonthlyEmi" class="mt-1 text-lg font-extrabold text-rose-600">₹0</p>
+            <p id="activeLoansCount" class="mt-0.5 text-[10px] font-medium text-slate-500">0 active loans</p>
+          </div>
+        </div>
+
+        <!-- #1 Debt Action Callout -->
+        <div id="topDebtActionCard" class="rounded-2xl border border-amber-200 bg-amber-50/80 p-3.5">
+          <div class="flex items-start gap-2.5">
+            <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-xs font-extrabold text-white">!</span>
+            <div>
+              <p class="text-[11px] font-extrabold uppercase tracking-wide text-amber-900">This Month's #1 Debt Action</p>
+              <p id="topDebtActionText" class="mt-0.5 text-xs leading-relaxed text-amber-950"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Loans Header + Add Button -->
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm font-bold text-slate-900">Active Family Loans</h3>
+          <button id="toggleAddLoanBtn" type="button" class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-700 active:scale-95">
+            + Add Loan
+          </button>
+        </div>
+
+        <!-- Add/Edit Loan Form -->
+        <form id="loanForm" class="hidden space-y-2.5 rounded-3xl border border-emerald-200 bg-white p-4 shadow-card">
+          <div class="flex items-center justify-between">
+            <h4 id="loanFormTitle" class="text-sm font-bold text-slate-900">Add New Loan</h4>
+            <button type="button" id="cancelLoanFormBtn" class="text-xs font-semibold text-slate-400">Cancel</button>
+          </div>
+          <input type="hidden" id="editLoanId" />
+          <input id="loanName" type="text" required placeholder="Loan Name (e.g. SBI Home Loan)" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white" />
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="mb-1 block text-[10px] font-semibold text-slate-500">Balance (₹)</label>
+              <input id="loanPrincipal" type="number" min="100" step="100" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
+            </div>
+            <div>
+              <label class="mb-1 block text-[10px] font-semibold text-slate-500">Rate (% p.a.)</label>
+              <input id="loanRate" type="number" min="0.1" max="50" step="0.1" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
+            </div>
+            <div>
+              <label class="mb-1 block text-[10px] font-semibold text-slate-500">EMI (₹/mo)</label>
+              <input id="loanEmi" type="number" min="100" step="100" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:bg-white" />
+            </div>
+          </div>
+          <button type="submit" class="w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700">Save Loan</button>
+        </form>
+
+        <!-- Active Loans List -->
+        <div id="loansListContainer" class="space-y-2"></div>
+
+        <!-- Extra Monthly Prepayment Simulator + Projection Curve -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-3">
+            <h3 class="text-sm font-bold text-slate-900">Debt Freedom Simulator</h3>
+            <p class="text-[11px] text-slate-500">Avalanche (highest rate) vs. Snowball (smallest balance)</p>
+          </div>
+
+          <div class="rounded-2xl bg-slate-50 p-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-700">Extra Monthly Prepayment</span>
+              <span id="extraPaymentValue" class="rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-800">₹10,000</span>
+            </div>
+            <input id="extraPaymentSlider" type="range" min="0" max="50000" step="1000" value="10000" class="mt-2.5 w-full" />
+            <div class="mt-1 flex justify-between text-[10px] font-medium text-slate-400">
+              <span>₹0</span>
+              <span>₹25,000</span>
+              <span>₹50,000</span>
+            </div>
+          </div>
+
+          <!-- Comparison Cards -->
+          <div id="payoffComparisonContainer" class="mt-3 space-y-2"></div>
+
+          <!-- Payoff Curve Chart -->
+          <div class="mt-4">
+            <p class="mb-2 text-[11px] font-bold text-slate-700">Remaining Debt Projection Curve</p>
+            <div class="relative h-44 w-full">
+              <canvas id="loanPayoffChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 5: PLAN & GOALS ==================== -->
+      <section id="tab-plan" class="tab-pane hidden space-y-3.5">
+
+        <!-- 6-Month Emergency Fund Tracker -->
+        <div class="rounded-3xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/80 via-white to-white p-4 shadow-card">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="rounded-md bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-800">Safety Net</span>
+              <h3 class="mt-1 text-sm font-bold text-slate-900">6-Month Emergency Fund</h3>
+              <p class="text-[11px] text-slate-500">Auto-calculated: 6 × essential monthly costs</p>
+            </div>
+            <span id="efPercentBadge" class="text-lg font-extrabold text-emerald-700">0%</span>
+          </div>
+
+          <div class="mt-3 flex items-baseline justify-between text-xs">
+            <span>Saved: <strong id="efSavedAmount" class="text-slate-900">₹0</strong></span>
+            <span>Target: <strong id="efTargetAmount" class="text-slate-700">₹0</strong></span>
+          </div>
+          <div class="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+            <div id="efProgressBar" class="h-full rounded-full bg-emerald-600 transition-all duration-300" style="width:0%"></div>
+          </div>
+
+          <div class="mt-3 flex items-center gap-2">
+            <button type="button" onclick="contributeEmergencyFund(5000)" class="flex-1 rounded-xl border border-emerald-200 bg-white py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-95">+ ₹5,000</button>
+            <button type="button" onclick="contributeEmergencyFund(10000)" class="flex-1 rounded-xl border border-emerald-200 bg-white py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-95">+ ₹10,000</button>
+            <button type="button" id="editEfCustomBtn" class="rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-700 active:scale-95">Set ₹</button>
+          </div>
+        </div>
+
+        <!-- Custom Family Goals -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Family Milestones & Goals</h3>
+              <p class="text-[11px] text-slate-500">Track upcoming major expenses</p>
+            </div>
+            <button id="toggleAddGoalBtn" type="button" class="rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-700 active:scale-95">
+              + New Goal
+            </button>
+          </div>
+
+          <!-- Add Goal Form -->
+          <form id="addGoalForm" class="mb-3 hidden space-y-2.5 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">Add Family Goal</span>
+              <button type="button" id="cancelGoalFormBtn" class="text-[11px] font-semibold text-slate-400">Cancel</button>
+            </div>
+            <input id="goalName" type="text" required placeholder="e.g. Kids College Fund, Car Downpayment" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-emerald-500" />
+            <div class="grid grid-cols-3 gap-2">
+              <input id="goalTarget" type="number" min="1000" required placeholder="Target ₹" class="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500" />
+              <input id="goalSaved" type="number" min="0" value="0" placeholder="Saved ₹" class="rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs outline-none focus:border-emerald-500" />
+              <input id="goalDate" type="month" required class="rounded-xl border border-slate-200 bg-white px-2 py-2 text-[11px] outline-none focus:border-emerald-500" />
+            </div>
+            <button type="submit" class="w-full rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white hover:bg-emerald-700">Save Goal</button>
+          </form>
+
+          <div id="goalsListContainer" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Weekly Family Review & AI Audit Export -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card">
+          <h3 class="text-sm font-bold text-slate-900">Weekly Family Review & AI Audit</h3>
+          <p class="mt-0.5 text-[11px] text-slate-500">Share clean summaries with your family or copy an anonymized prompt for Gemini.</p>
+
+          <div class="mt-3 space-y-2.5">
+            <button id="copyWhatsappBtn" type="button" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 active:scale-[0.99]">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <span>Copy WhatsApp Family Summary</span>
+            </button>
+
+            <button id="copyAiPromptBtn" type="button" class="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 py-3 text-xs font-bold text-slate-800 transition hover:bg-slate-100 active:scale-[0.99]">
+              <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span>Copy Redacted AI Audit Prompt</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Fixed 5-Tab Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-md border-t border-slate-200/80 bg-white/95 px-1.5 pt-1.5 pb-safe shadow-nav backdrop-blur-md sm:absolute">
+      <div class="grid grid-cols-5 gap-0.5">
+        <button type="button" data-tab="overview" class="nav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-emerald-600 transition">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span class="mt-0.5 text-[10px] font-semibold">Overview</span>
+        </button>
+
+        <button type="button" data-tab="budget" class="nav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-slate-400 transition">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <span class="mt-0.5 text-[10px] font-semibold">Budget</span>
+        </button>
+
+        <button type="button" data-tab="expenses" class="nav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-slate-400 transition">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span class="mt-0.5 text-[10px] font-semibold">Expenses</span>
+        </button>
+
+        <button type="button" data-tab="loans" class="nav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-slate-400 transition">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="mt-0.5 text-[10px] font-semibold">Loans</span>
+        </button>
+
+        <button type="button" data-tab="plan" class="nav-btn flex flex-col items-center justify-center rounded-xl py-1.5 text-slate-400 transition">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <span class="mt-0.5 text-[10px] font-semibold">Plan</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ==================== SETTINGS, SYNC & PIN MODAL ==================== -->
+    <div id="settingsModal" class="fixed inset-0 z-40 hidden items-end justify-center bg-slate-900/50 backdrop-blur-xs sm:items-center">
+      <div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-900">Settings, Sync & Privacy</h2>
+          <button id="closeSettingsBtn" type="button" class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Family Members -->
+        <form id="settingsMembersForm" class="space-y-2.5">
+          <label class="block text-xs font-bold text-slate-800">Family of 4 Member Names</label>
+          <div class="grid grid-cols-2 gap-2">
+            <input id="memberInput0" type="text" required class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white" />
+            <input id="memberInput1" type="text" required class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white" />
+            <input id="memberInput2" type="text" required class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white" />
+            <input id="memberInput3" type="text" required class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium outline-none focus:border-emerald-500 focus:bg-white" />
+          </div>
+          <button type="submit" class="w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-700">Save Member Names</button>
+        </form>
+
+        <!-- 4-Digit Local PIN Lock -->
+        <div class="mt-5 border-t border-slate-100 pt-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-slate-800">4-Digit Local PIN Lock</p>
+              <p id="pinStatusText" class="text-[11px] text-slate-500">Currently disabled</p>
+            </div>
+            <button id="togglePinBtn" type="button" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">Enable PIN</button>
+          </div>
+          <form id="setPinForm" class="mt-2.5 hidden items-center gap-2">
+            <input id="newPinInput" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required placeholder="Enter 4 digits" class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold tracking-widest outline-none focus:border-emerald-500 focus:bg-white" />
+            <button type="submit" class="rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-bold text-white">Save PIN</button>
+          </form>
+        </div>
+
+        <!-- Backup & Multi-Phone Sync -->
+        <div class="mt-5 border-t border-slate-100 pt-4">
+          <p class="text-xs font-bold text-slate-800">Multi-Phone Family Sync (WhatsApp / AirDrop)</p>
+          <p class="mt-0.5 text-[11px] text-slate-500">Export JSON on one phone and import on another—zero cloud servers.</p>
+          <div class="mt-2.5 grid grid-cols-2 gap-2">
+            <button id="exportJsonBtn" type="button" class="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 py-2.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100">
+              <span>Export Backup</span>
+            </button>
+            <label class="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100">
+              <span>Import Backup</span>
+              <input id="importJsonInput" type="file" accept=".json,application/json" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Reset Controls -->
+        <div class="mt-5 grid grid-cols-2 gap-2 border-t border-slate-100 pt-4">
+          <button id="resetSampleBtn" type="button" class="rounded-xl border border-amber-200 bg-amber-50 py-2.5 text-xs font-bold text-amber-800 hover:bg-amber-100">Reset Sample Data</button>
+          <button id="clearAllBtn" type="button" class="rounded-xl border border-rose-200 bg-rose-50 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100">Clear All Data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== GENERIC INPUT MODAL (Income / Caps / Goal Add) ==================== -->
+    <div id="inputModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs">
+      <form id="inputModalForm" class="w-full max-w-xs rounded-3xl bg-white p-5 shadow-2xl">
+        <h3 id="inputModalTitle" class="text-sm font-bold text-slate-900">Edit Value</h3>
+        <p id="inputModalDesc" class="mt-1 text-xs text-slate-500"></p>
+        <input id="inputModalField" type="number" min="0" step="100" required class="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-base font-extrabold text-slate-900 outline-none focus:border-emerald-500 focus:bg-white" />
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button id="inputModalCancel" type="button" class="rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-semibold text-slate-700">Cancel</button>
+          <button type="submit" class="rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white">Save</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ==================== CONFIRMATION MODAL ==================== -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur-xs">
+      <div class="w-full max-w-xs rounded-3xl bg-white p-5 shadow-2xl">
+        <h3 id="confirmTitle" class="text-sm font-bold text-slate-900">Confirm</h3>
+        <p id="confirmMessage" class="mt-1.5 text-xs leading-relaxed text-slate-600"></p>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button id="confirmCancelBtn" type="button" class="rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-semibold text-slate-700">Cancel</button>
+          <button id="confirmOkBtn" type="button" class="rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TOAST NOTIFICATION ==================== -->
+    <div id="toastContainer" class="pointer-events-none fixed left-1/2 top-16 z-50 -translate-x-1/2 -translate-y-2 opacity-0 transition-all duration-300">
+      <div id="toastPill" class="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white shadow-lg"></div>
+    </div>
+
+  </div>
+
+  <!-- ==================== APPLICATION JAVASCRIPT ==================== -->
+  <script>
+    /**
+     * ParivarVault Pro — Complete Multi-Month Family Financial OS (India)
+     * 100% Local-First (localStorage), Offline-Ready for GitHub Pages, iOS & Android PWA.
+     */
+
+    const STORAGE_KEY = 'parivarVaultPro_v2';
+    const TODAY_MONTH_KEY = '2026-11'; // Current active default month
+
+    const CATEGORIES = [
+      'Loans & EMIs',
+      'Groceries',
+      'Utilities',
+      'Education',
+      'Transport',
+      'Medical & Insurance',
+      'Dining & Subscriptions',
+      'Shopping & Misc'
+    ];
+
+    const ESSENTIAL_CATEGORIES = [
+      'Loans & EMIs',
+      'Groceries',
+      'Utilities',
+      'Education',
+      'Transport',
+      'Medical & Insurance'
+    ];
+
+    const CATEGORY_COLORS = {
+      'Loans & EMIs': '#dc2626',          // Coral Red
+      'Groceries': '#059669',             // Emerald
+      'Utilities': '#0284c7',             // Sky Blue
+      'Education': '#7c3aed',             // Violet
+      'Transport': '#d97706',             // Amber
+      'Medical & Insurance': '#0d9488',   // Teal
+      'Dining & Subscriptions': '#ea580c',// Orange
+      'Shopping & Misc': '#64748b'        // Slate
+    };
+
+    const MEMBER_BADGE_COLORS = [
+      'bg-emerald-100 text-emerald-800',
+      'bg-sky-100 text-sky-800',
+      'bg-amber-100 text-amber-800',
+      'bg-violet-100 text-violet-800'
+    ];
+
+    // Indian Rupee Formatter (₹1,20,000)
+    function formatINR(num) {
+      const val = Math.round(Number(num) || 0);
+      const absStr = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0
+      }).format(Math.abs(val));
+      return val < 0 ? `-${absStr}` : absStr;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Month Key Helpers (YYYY-MM)
+    function shiftMonthKey(monthKey, delta) {
+      const [y, m] = monthKey.split('-').map(Number);
+      const d = new Date(y, m - 1 + delta, 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function formatMonthLabel(monthKey, shortYear = false) {
+      const [y, m] = monthKey.split('-').map(Number);
+      const d = new Date(y, m - 1, 1);
+      return d.toLocaleDateString('en-IN', {
+        month: 'short',
+        year: shortYear ? '2-digit' : 'numeric'
+      });
+    }
+
+    // Pre-seeded realistic Indian Family of 4 Dataset (with 2 historical months + Nov 2026)
+    function createSampleData() {
+      return {
+        activeMonth: TODAY_MONTH_KEY,
+        defaultIncome: 120000,
+        monthIncomes: {
+          '2026-09': 120000,
+          '2026-10': 125000,
+          '2026-11': 120000
+        },
+        members: ['Member 1 (Dad)', 'Member 2 (Mom)', 'Member 3', 'Member 4'],
+        budgets: {
+          'Loans & EMIs': 45105,
+          'Groceries': 16000,
+          'Utilities': 6000,
+          'Education': 10000,
+          'Transport': 6000,
+          'Medical & Insurance': 5000,
+          'Dining & Subscriptions': 5000,
+          'Shopping & Misc': 4000
+        },
+        recurringBills: [
+          { id: 'bill_1', name: 'Home Loan / Rent', amount: 30000, dueDay: 5, category: 'Loans & EMIs' },
+          { id: 'bill_2', name: 'Personal / Vehicle Loan EMI', amount: 10105, dueDay: 10, category: 'Loans & EMIs' },
+          { id: 'bill_3', name: 'Credit Card EMI', amount: 5000, dueDay: 15, category: 'Loans & EMIs' },
+          { id: 'bill_4', name: 'Electricity & Wi-Fi', amount: 6000, dueDay: 18, category: 'Utilities' },
+          { id: 'bill_5', name: 'School / College Fees', amount: 10000, dueDay: 1, category: 'Education' },
+          { id: 'bill_6', name: 'Domestic Help', amount: 4000, dueDay: 1, category: 'Utilities' }
+        ],
+        billPayments: {
+          '2026-11': {
+            'bill_1': 'tx_nov_b1',
+            'bill_2': 'tx_nov_b2',
+            'bill_3': 'tx_nov_b3',
+            'bill_5': 'tx_nov_b5',
+            'bill_6': 'tx_nov_b6'
+          }
+        },
+        transactions: [
+          // Historical: Sep 2026
+          { id: 'tx_sep_1', monthKey: '2026-09', date: '2026-09-05', amount: 45105, category: 'Loans & EMIs', memberIdx: 0, note: 'All Monthly Loan EMIs', paymentMode: 'Bank' },
+          { id: 'tx_sep_2', monthKey: '2026-09', date: '2026-09-08', amount: 17200, category: 'Groceries', memberIdx: 1, note: 'DMart & BigBasket Groceries', paymentMode: 'UPI' },
+          { id: 'tx_sep_3', monthKey: '2026-09', date: '2026-09-10', amount: 9800, category: 'Utilities', memberIdx: 0, note: 'EB Bill, Fiber Wi-Fi & Help', paymentMode: 'UPI' },
+          { id: 'tx_sep_4', monthKey: '2026-09', date: '2026-09-12', amount: 10000, category: 'Education', memberIdx: 2, note: 'School Fees', paymentMode: 'Bank' },
+          { id: 'tx_sep_5', monthKey: '2026-09', date: '2026-09-18', amount: 6400, category: 'Transport', memberIdx: 0, note: 'Petrol & FASTag', paymentMode: 'Card' },
+          { id: 'tx_sep_6', monthKey: '2026-09', date: '2026-09-22', amount: 6900, category: 'Dining & Subscriptions', memberIdx: 1, note: 'Family Dining & OTT', paymentMode: 'Card' },
+          { id: 'tx_sep_7', monthKey: '2026-09', date: '2026-09-25', amount: 4800, category: 'Medical & Insurance', memberIdx: 3, note: 'Apollo Pharmacy & Health', paymentMode: 'UPI' },
+
+          // Historical: Oct 2026
+          { id: 'tx_oct_1', monthKey: '2026-10', date: '2026-10-05', amount: 45105, category: 'Loans & EMIs', memberIdx: 0, note: 'All Monthly Loan EMIs', paymentMode: 'Bank' },
+          { id: 'tx_oct_2', monthKey: '2026-10', date: '2026-10-07', amount: 15800, category: 'Groceries', memberIdx: 1, note: 'Monthly Groceries & Fruits', paymentMode: 'UPI' },
+          { id: 'tx_oct_3', monthKey: '2026-10', date: '2026-10-12', amount: 9500, category: 'Utilities', memberIdx: 0, note: 'Electricity, Gas & Help', paymentMode: 'UPI' },
+          { id: 'tx_oct_4', monthKey: '2026-10', date: '2026-10-03', amount: 10000, category: 'Education', memberIdx: 2, note: 'School & Tuition Fees', paymentMode: 'Bank' },
+          { id: 'tx_oct_5', monthKey: '2026-10', date: '2026-10-15', amount: 5200, category: 'Transport', memberIdx: 0, note: 'Fuel & Metro', paymentMode: 'Card' },
+          { id: 'tx_oct_6', monthKey: '2026-10', date: '2026-10-20', amount: 7800, category: 'Shopping & Misc', memberIdx: 1, note: 'Festive Clothing & Gifts', paymentMode: 'Card' },
+          { id: 'tx_oct_7', monthKey: '2026-10', date: '2026-10-24', amount: 4200, category: 'Dining & Subscriptions', memberIdx: 3, note: 'Swiggy & Weekend Dinner', paymentMode: 'UPI' },
+
+          // Current: Nov 2026
+          { id: 'tx_nov_b1', monthKey: '2026-11', date: '2026-11-05', amount: 30000, category: 'Loans & EMIs', memberIdx: 0, note: 'Home Loan / Rent (Bill)', paymentMode: 'Bank', billId: 'bill_1' },
+          { id: 'tx_nov_b2', monthKey: '2026-11', date: '2026-11-10', amount: 10105, category: 'Loans & EMIs', memberIdx: 0, note: 'Personal / Vehicle Loan EMI (Bill)', paymentMode: 'Bank', billId: 'bill_2' },
+          { id: 'tx_nov_b3', monthKey: '2026-11', date: '2026-11-15', amount: 5000, category: 'Loans & EMIs', memberIdx: 0, note: 'Credit Card EMI (Bill)', paymentMode: 'Card', billId: 'bill_3' },
+          { id: 'tx_nov_b5', monthKey: '2026-11', date: '2026-11-01', amount: 10000, category: 'Education', memberIdx: 2, note: 'School / College Fees (Bill)', paymentMode: 'Bank', billId: 'bill_5' },
+          { id: 'tx_nov_b6', monthKey: '2026-11', date: '2026-11-01', amount: 4000, category: 'Utilities', memberIdx: 1, note: 'Domestic Help (Bill)', paymentMode: 'Cash', billId: 'bill_6' },
+          { id: 'tx_nov_1', monthKey: '2026-11', date: '2026-11-04', amount: 8900, category: 'Groceries', memberIdx: 1, note: 'DMart Monthly Staples & Rice', paymentMode: 'UPI' },
+          { id: 'tx_nov_2', monthKey: '2026-11', date: '2026-11-12', amount: 4300, category: 'Groceries', memberIdx: 1, note: 'Blinkit Vegetables, Milk & Fruits', paymentMode: 'UPI' },
+          { id: 'tx_nov_3', monthKey: '2026-11', date: '2026-11-14', amount: 3900, category: 'Transport', memberIdx: 0, note: 'IndianOil Petrol & FASTag', paymentMode: 'Card' },
+          { id: 'tx_nov_4', monthKey: '2026-11', date: '2026-11-16', amount: 2650, category: 'Medical & Insurance', memberIdx: 3, note: 'Apollo Pharmacy & Lab Test', paymentMode: 'UPI' },
+          { id: 'tx_nov_5', monthKey: '2026-11', date: '2026-11-19', amount: 3150, category: 'Dining & Subscriptions', memberIdx: 2, note: 'Swiggy Family Dinner & Netflix', paymentMode: 'Card' },
+          { id: 'tx_nov_6', monthKey: '2026-11', date: '2026-11-21', amount: 2200, category: 'Shopping & Misc', memberIdx: 3, note: 'Kids Books & Winter Wear', paymentMode: 'UPI' }
+        ],
+        loans: [
+          { id: 'loan_1', name: 'Home Loan', principal: 2800000, rate: 8.5, emi: 30000 },
+          { id: 'loan_2', name: 'Vehicle / Personal Loan', principal: 420000, rate: 11.5, emi: 10105 },
+          { id: 'loan_3', name: 'Credit Card EMI', principal: 65000, rate: 18.0, emi: 5000 }
+        ],
+        emergencyFundSaved: 175000,
+        goals: [
+          { id: 'goal_1', name: 'Kids Higher Education', target: 800000, saved: 240000, targetDate: '2030-05' },
+          { id: 'goal_2', name: 'Annual Health Insurance Buffer', target: 45000, saved: 28000, targetDate: '2027-03' },
+          { id: 'goal_3', name: 'Family Vacation Fund', target: 100000, saved: 35000, targetDate: '2027-10' }
+        ],
+        pin: { enabled: false, code: '' }
+      };
+    }
+
+    let state = loadState();
+    let currentTab = 'overview';
+    let cashflowChart = null;
+    let donutChart = null;
+    let loanPayoffChart = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.members) && Array.isArray(parsed.transactions)) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn('localStorage load failed, using defaults.', e);
+      }
+      const fresh = createSampleData();
+      saveState(fresh);
+      return fresh;
+    }
+
+    function saveState(s = state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+      } catch (e) {
+        showToast('Storage full! Export a JSON backup.', 'error');
+      }
+    }
+
+    // ==================== TOAST, CONFIRM & INPUT MODALS ====================
+    let toastTimer = null;
+    function showToast(msg, type = 'default') {
+      const box = document.getElementById('toastContainer');
+      const pill = document.getElementById('toastPill');
+      pill.textContent = msg;
+      pill.className = 'rounded-full px-4 py-2 text-xs font-bold text-white shadow-lg ' + (
+        type === 'success' ? 'bg-emerald-600' :
+        type === 'error' ? 'bg-rose-600' : 'bg-slate-900'
+      );
+      box.classList.remove('opacity-0', '-translate-y-2');
+      box.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        box.classList.add('opacity-0', '-translate-y-2');
+        box.classList.remove('opacity-100', 'translate-y-0');
+      }, 2600);
+    }
+
+    let confirmCb = null;
+    function openConfirm(title, message, onOk) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      confirmCb = onOk;
+      const m = document.getElementById('confirmModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeConfirm() {
+      const m = document.getElementById('confirmModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+      confirmCb = null;
+    }
+    document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirm);
+    document.getElementById('confirmOkBtn').addEventListener('click', () => {
+      if (typeof confirmCb === 'function') confirmCb();
+      closeConfirm();
+    });
+
+    let inputModalCb = null;
+    function openInputModal(title, desc, initialVal, onSave) {
+      document.getElementById('inputModalTitle').textContent = title;
+      document.getElementById('inputModalDesc').textContent = desc;
+      const field = document.getElementById('inputModalField');
+      field.value = initialVal;
+      inputModalCb = onSave;
+      const m = document.getElementById('inputModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      setTimeout(() => field.focus(), 50);
+    }
+    function closeInputModal() {
+      const m = document.getElementById('inputModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+      inputModalCb = null;
+    }
+    document.getElementById('inputModalCancel').addEventListener('click', closeInputModal);
+    document.getElementById('inputModalForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = Math.max(0, Math.round(parseFloat(document.getElementById('inputModalField').value) || 0));
+      if (typeof inputModalCb === 'function') inputModalCb(val);
+      closeInputModal();
+    });
+
+    // Safe Clipboard Copy using execCommand (works reliably inside iFrames & mobile webviews)
+    function copyTextToClipboard(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg, 'success');
+      } catch (e) {
+        showToast('Could not copy to clipboard', 'error');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // ==================== CORE MONTH COMPUTATIONS ====================
+    function getMonthIncome(monthKey) {
+      if (state.monthIncomes && typeof state.monthIncomes[monthKey] === 'number') {
+        return state.monthIncomes[monthKey];
+      }
+      return state.defaultIncome || 120000;
+    }
+
+    function getMonthTransactions(monthKey) {
+      return state.transactions.filter(t => t.monthKey === monthKey);
+    }
+
+    function computeMonthMetrics(monthKey) {
+      const income = getMonthIncome(monthKey);
+      const txs = getMonthTransactions(monthKey);
+      const catTotals = {};
+      CATEGORIES.forEach(c => catTotals[c] = 0);
+      const memberTotals = [0, 0, 0, 0];
+
+      txs.forEach(t => {
+        const amt = Number(t.amount) || 0;
+        const cat = catTotals.hasOwnProperty(t.category) ? t.category : 'Shopping & Misc';
+        catTotals[cat] += amt;
+        const mIdx = Math.min(3, Math.max(0, Number(t.memberIdx) || 0));
+        memberTotals[mIdx] += amt;
+      });
+
+      // Active Loan EMIs (use max of logged Loans & EMIs vs active loans total EMI for realistic EMI ratio)
+      const activeLoansEmi = state.loans.reduce((s, l) => s + (Number(l.emi) || 0), 0);
+      const totalSpent = Object.values(catTotals).reduce((a, b) => a + b, 0);
+      const surplus = income - totalSpent;
+      const savingsRate = income > 0 ? Math.round((surplus / income) * 100) : 0;
+      const emiRatio = income > 0 ? Math.round((Math.max(catTotals['Loans & EMIs'], activeLoansEmi) / income) * 1000) / 10 : 0;
+
+      // Essential monthly cost = sum of budget caps for essential categories (fallback if no transactions yet)
+      const essentialMonthly = ESSENTIAL_CATEGORIES.reduce((s, c) => s + (Number(state.budgets[c]) || 0), 0);
+      const efTarget = Math.max(100000, essentialMonthly * 6);
+      const efRatio = Math.min(1, (Number(state.emergencyFundSaved) || 0) / efTarget);
+
+      // Budget Adherence
+      let withinCapCount = 0;
+      const overspentCats = [];
+      CATEGORIES.forEach(c => {
+        const cap = Number(state.budgets[c]) || 0;
+        if (cap <= 0 || catTotals[c] <= cap) {
+          withinCapCount++;
+        } else {
+          overspentCats.push({ name: c, over: catTotals[c] - cap });
+        }
+      });
+      const adherenceRatio = withinCapCount / CATEGORIES.length;
+
+      // Health Score (0 - 100) across 4 metrics (25 pts each)
+      const sPts = savingsRate >= 20 ? 25 : Math.max(0, Math.round((savingsRate / 20) * 25));
+      const ePts = emiRatio <= 30 ? 25 : emiRatio <= 40 ? Math.round(25 - ((emiRatio - 30) / 10) * 7) : Math.max(0, Math.round(18 - ((emiRatio - 40) / 25) * 18));
+      const bPts = Math.round(adherenceRatio * 25);
+      const fPts = Math.round(efRatio * 25);
+      const healthScore = Math.min(100, Math.max(0, sPts + ePts + bPts + fPts));
+
+      return {
+        monthKey,
+        income,
+        txs,
+        catTotals,
+        memberTotals,
+        totalSpent,
+        surplus,
+        savingsRate,
+        emiRatio,
+        activeLoansEmi,
+        efTarget,
+        efRatio,
+        withinCapCount,
+        overspentCats,
+        healthScore,
+        subScores: { sPts, ePts, bPts, fPts }
+      };
+    }
+
+    // ==================== NAVIGATION & MONTH SWITCHING ====================
+    function updateHeaderMonth() {
+      const label = formatMonthLabel(state.activeMonth);
+      document.getElementById('activeMonthLabel').textContent = label;
+      document.querySelectorAll('.active-month-inline').forEach(el => el.textContent = label);
+      document.getElementById('currentMonthDot').classList.toggle('hidden', state.activeMonth !== TODAY_MONTH_KEY);
+    }
+
+    document.getElementById('prevMonthBtn').addEventListener('click', () => {
+      state.activeMonth = shiftMonthKey(state.activeMonth, -1);
+      saveState();
+      refreshActiveTab();
+    });
+
+    document.getElementById('nextMonthBtn').addEventListener('click', () => {
+      state.activeMonth = shiftMonthKey(state.activeMonth, 1);
+      saveState();
+      refreshActiveTab();
+    });
+
+    function switchTab(tabName) {
+      currentTab = tabName;
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+      const target = document.getElementById(`tab-${tabName}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tabName;
+        btn.classList.toggle('text-emerald-600', isActive);
+        btn.classList.toggle('text-slate-400', !isActive);
+      });
+
+      refreshActiveTab();
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    function refreshActiveTab() {
+      updateHeaderMonth();
+      populateCategoryAndMemberSelects();
+      if (currentTab === 'overview') renderOverviewTab();
+      if (currentTab === 'budget') renderBudgetTab();
+      if (currentTab === 'expenses') renderExpensesTab();
+      if (currentTab === 'loans') renderLoansTab();
+      if (currentTab === 'plan') renderPlanTab();
+    }
+
+    function populateCategoryAndMemberSelects() {
+      const catOpts = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+      const billCat = document.getElementById('billCategory');
+      const txCat = document.getElementById('txCategory');
+      const filterCat = document.getElementById('filterCategory');
+      const prevFilterCat = filterCat.value || 'ALL';
+
+      if (!billCat.options.length) billCat.innerHTML = catOpts;
+      if (!txCat.options.length) txCat.innerHTML = catOpts;
+      filterCat.innerHTML = `<option value="ALL">All Categories</option>` + catOpts;
+      filterCat.value = prevFilterCat;
+
+      const memOpts = state.members.map((m, i) => `<option value="${i}">${escapeHtml(m)}</option>`).join('');
+      document.getElementById('txMember').innerHTML = memOpts;
+      const filterMem = document.getElementById('filterMember');
+      const prevFilterMem = filterMem.value || 'ALL';
+      filterMem.innerHTML = `<option value="ALL">All Members</option>` + memOpts;
+      filterMem.value = prevFilterMem;
+    }
+
+    // ==================== TAB 1: OVERVIEW ====================
+    function renderOverviewTab() {
+      const m = computeMonthMetrics(state.activeMonth);
+
+      // Financial Health Score
+      document.getElementById('healthScoreNumber').textContent = m.healthScore;
+      const badge = document.getElementById('healthScoreBadge');
+      const ring = document.getElementById('healthScoreRing');
+      const circumference = 144.5;
+      ring.style.strokeDashoffset = circumference - (m.healthScore / 100) * circumference;
+
+      if (m.healthScore >= 75) {
+        badge.textContent = 'Strong';
+        badge.className = 'ml-1 rounded-full bg-emerald-500/25 px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald-300 ring-1 ring-emerald-400/40';
+        ring.style.stroke = '#10b981';
+      } else if (m.healthScore >= 50) {
+        badge.textContent = 'Stabilizing';
+        badge.className = 'ml-1 rounded-full bg-amber-500/25 px-2.5 py-0.5 text-[10px] font-bold uppercase text-amber-300 ring-1 ring-amber-400/40';
+        ring.style.stroke = '#f59e0b';
+      } else {
+        badge.textContent = 'Needs Attention';
+        badge.className = 'ml-1 rounded-full bg-rose-500/25 px-2.5 py-0.5 text-[10px] font-bold uppercase text-rose-200 ring-1 ring-rose-400/40';
+        ring.style.stroke = '#f43f5e';
+      }
+
+      // 4 Health Sub-Metrics
+      document.getElementById('healthSubMetrics').innerHTML = `
+        <div class="rounded-xl bg-white/10 px-1.5 py-1.5">
+          <p class="text-[9px] text-slate-300">Savings</p>
+          <p class="text-xs font-bold text-white">${m.subScores.sPts}/25</p>
+        </div>
+        <div class="rounded-xl bg-white/10 px-1.5 py-1.5">
+          <p class="text-[9px] text-slate-300">EMI Load</p>
+          <p class="text-xs font-bold text-white">${m.subScores.ePts}/25</p>
+        </div>
+        <div class="rounded-xl bg-white/10 px-1.5 py-1.5">
+          <p class="text-[9px] text-slate-300">Budgets</p>
+          <p class="text-xs font-bold text-white">${m.subScores.bPts}/25</p>
+        </div>
+        <div class="rounded-xl bg-white/10 px-1.5 py-1.5">
+          <p class="text-[9px] text-slate-300">Safety Net</p>
+          <p class="text-xs font-bold text-white">${m.subScores.fPts}/25</p>
+        </div>
+      `;
+
+      // Dynamic Action Tips (2–3 concrete tips)
+      const tips = [];
+      const highestLoan = [...state.loans].sort((a, b) => b.rate - a.rate)[0];
+      if (highestLoan && m.surplus > 2000) {
+        const redirectAmt = Math.min(m.surplus, Math.max(5000, Math.round((m.surplus * 0.4) / 1000) * 1000));
+        tips.push(`Your EMIs take <strong>${m.emiRatio}%</strong> of income — redirect <strong>${formatINR(redirectAmt)}</strong> of your surplus to your highest-interest <strong>${escapeHtml(highestLoan.name)} (${highestLoan.rate}%)</strong> first.`);
+      } else if (m.emiRatio > 40) {
+        tips.push(`EMI load is <strong>${m.emiRatio}%</strong> (above the 40% safe limit). Pause discretionary shopping until your top-rate loan closes.`);
+      }
+
+      if (m.overspentCats.length > 0) {
+        const worst = m.overspentCats.sort((a, b) => b.over - a.over)[0];
+        tips.push(`<strong>${worst.name}</strong> is over budget by <strong>${formatINR(worst.over)}</strong> this month. Trim remaining spends in this bucket.`);
+      } else {
+        const unpaidBills = state.recurringBills.filter(b => !(state.billPayments[state.activeMonth] && state.billPayments[state.activeMonth][b.id]));
+        if (unpaidBills.length > 0) {
+          const unpaidSum = unpaidBills.reduce((s, b) => s + b.amount, 0);
+          tips.push(`You have <strong>${unpaidBills.length} unpaid recurring bill${unpaidBills.length > 1 ? 's' : ''}</strong> (${formatINR(unpaidSum)}). Mark them paid in the Budget tab.`);
+        } else {
+          tips.push(`Great discipline! All ${CATEGORIES.length} budget categories are within caps for ${formatMonthLabel(state.activeMonth)}.`);
+        }
+      }
+
+      if (m.efRatio < 1) {
+        const gap = Math.max(0, m.efTarget - (state.emergencyFundSaved || 0));
+        tips.push(`Emergency fund is <strong>${Math.round(m.efRatio * 100)}%</strong> funded (${formatINR(gap)} remaining for a full 6-month buffer).`);
+      }
+
+      document.getElementById('healthActionTips').innerHTML = tips.slice(0, 3).map(t => `<li class="flex items-start gap-1.5"><span class="text-emerald-400">•</span><span>${t}</span></li>`).join('');
+
+      // KPI Grid
+      document.getElementById('kpiIncome').textContent = formatINR(m.income);
+      document.getElementById('kpiSpent').textContent = formatINR(m.totalSpent);
+      document.getElementById('kpiEmiShare').textContent = `EMIs: ${m.emiRatio}% of income`;
+
+      const surpEl = document.getElementById('kpiSurplus');
+      surpEl.textContent = formatINR(m.surplus);
+      surpEl.className = 'mt-1 text-lg font-extrabold ' + (m.surplus >= 0 ? 'text-emerald-600' : 'text-rose-600');
+      document.getElementById('kpiSurplusNote').textContent = m.surplus >= 0 ? 'Available to save / prepay' : 'Deficit — cut non-essentials';
+
+      const srEl = document.getElementById('kpiSavingsRate');
+      srEl.textContent = `${m.savingsRate}%`;
+      srEl.className = 'mt-1 text-lg font-extrabold ' + (m.savingsRate >= 20 ? 'text-emerald-600' : m.savingsRate >= 10 ? 'text-amber-600' : 'text-rose-600');
+
+      // 6-Month Cashflow Chart
+      renderCashflowChart();
+
+      // Category Donut Chart
+      renderCategoryDonut(m);
+
+      // Per-Member Spending Bars
+      const totalMem = m.memberTotals.reduce((a, b) => a + b, 0);
+      document.getElementById('memberBarsContainer').innerHTML = state.members.map((name, idx) => {
+        const amt = m.memberTotals[idx] || 0;
+        const pct = totalMem > 0 ? Math.round((amt / totalMem) * 100) : 0;
+        return `
+          <div>
+            <div class="mb-1 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${MEMBER_BADGE_COLORS[idx]}">${escapeHtml(name.slice(0, 2).toUpperCase())}</span>
+                <span class="font-semibold text-slate-800">${escapeHtml(name)}</span>
+              </div>
+              <span class="font-bold text-slate-900">${formatINR(amt)} <span class="text-[10px] font-medium text-slate-400">(${pct}%)</span></span>
+            </div>
+            <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div class="h-full rounded-full bg-emerald-600 transition-all duration-300" style="width:${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderCashflowChart() {
+      const monthKeys = [];
+      for (let i = -5; i <= 0; i++) {
+        monthKeys.push(shiftMonthKey(state.activeMonth, i));
+      }
+      const labels = monthKeys.map(k => formatMonthLabel(k, true));
+      const incomes = [];
+      const expenses = [];
+      const savings = [];
+
+      monthKeys.forEach(k => {
+        const txs = getMonthTransactions(k);
+        const spent = txs.reduce((s, t) => s + (Number(t.amount) || 0), 0);
+        const hasHistory = txs.length > 0 || (state.monthIncomes && state.monthIncomes[k] !== undefined);
+        const inc = hasHistory ? getMonthIncome(k) : 0;
+        incomes.push(inc);
+        expenses.push(spent);
+        savings.push(hasHistory ? Math.max(0, inc - spent) : 0);
+      });
+
+      const ctx = document.getElementById('cashflowChart').getContext('2d');
+      if (cashflowChart) cashflowChart.destroy();
+      cashflowChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Income',
+              data: incomes,
+              backgroundColor: 'rgba(5, 150, 105, 0.22)',
+              borderColor: '#059669',
+              borderWidth: 1.5,
+              borderRadius: 6,
+              order: 2
+            },
+            {
+              label: 'Expenses',
+              data: expenses,
+              backgroundColor: 'rgba(220, 38, 38, 0.72)',
+              borderRadius: 6,
+              order: 3
+            },
+            {
+              type: 'line',
+              label: 'Savings',
+              data: savings,
+              borderColor: '#059669',
+              backgroundColor: '#059669',
+              borderWidth: 2.5,
+              pointRadius: 3.5,
+              tension: 0.35,
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 10, font: { size: 10, family: 'Inter' } }
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${formatINR(ctx.raw)}`
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: {
+              grid: { color: '#f1f5f9' },
+              ticks: {
+                font: { size: 10 },
+                callback: (v) => v >= 1000 ? `₹${Math.round(v / 1000)}k` : `₹${v}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderCategoryDonut(m) {
+      document.getElementById('donutCenterTotal').textContent = formatINR(m.totalSpent);
+      const values = CATEGORIES.map(c => m.catTotals[c]);
+      const colors = CATEGORIES.map(c => CATEGORY_COLORS[c]);
+      const hasData = values.some(v => v > 0);
+
+      const ctx = document.getElementById('categoryDonutChart').getContext('2d');
+      if (donutChart) donutChart.destroy();
+      donutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: hasData ? CATEGORIES : ['No Data'],
+          datasets: [{
+            data: hasData ? values : [1],
+            backgroundColor: hasData ? colors : ['#e2e8f0'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              enabled: hasData,
+              callbacks: { label: (it) => ` ${it.label}: ${formatINR(it.raw)}` }
+            }
+          }
+        }
+      });
+
+      document.getElementById('donutLegend').innerHTML = CATEGORIES.map((c, i) => {
+        const val = values[i];
+        const pct = m.totalSpent > 0 ? Math.round((val / m.totalSpent) * 100) : 0;
+        return `
+          <div class="flex items-center justify-between rounded-xl bg-slate-50 px-2 py-1.5">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="h-2 w-2 shrink-0 rounded-full" style="background:${colors[i]}"></span>
+              <span class="truncate font-medium text-slate-700">${c}</span>
+            </div>
+            <span class="ml-1 shrink-0 font-bold text-slate-900">${formatINR(val)} <span class="text-[9px] font-normal text-slate-400">${pct}%</span></span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('editMonthIncomeBtn').addEventListener('click', () => {
+      const cur = getMonthIncome(state.activeMonth);
+      openInputModal(
+        `Income for ${formatMonthLabel(state.activeMonth)}`,
+        'Enter combined take-home family income (₹) for this month.',
+        cur,
+        (val) => {
+          if (!state.monthIncomes) state.monthIncomes = {};
+          state.monthIncomes[state.activeMonth] = val;
+          saveState();
+          renderOverviewTab();
+          showToast('Monthly income updated!', 'success');
+        }
+      );
+    });
+
+    // ==================== TAB 2: BUDGET & BILLS ====================
+    function renderBudgetTab() {
+      const m = computeMonthMetrics(state.activeMonth);
+      const paidMap = state.billPayments[state.activeMonth] || {};
+
+      let paidCount = 0;
+      const billsHtml = state.recurringBills.map(bill => {
+        const isPaid = Boolean(paidMap[bill.id]);
+        if (isPaid) paidCount++;
+        return `
+          <div class="flex items-center justify-between gap-2 rounded-2xl border ${isPaid ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200/80 bg-slate-50/50'} p-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <p class="truncate text-xs font-bold ${isPaid ? 'text-emerald-900 line-through opacity-75' : 'text-slate-900'}">${escapeHtml(bill.name)}</p>
+                <span class="rounded bg-slate-200/70 px-1.5 py-0.5 text-[9px] font-semibold text-slate-600">Due ${bill.dueDay}th</span>
+              </div>
+              <p class="mt-0.5 text-[11px] font-semibold text-slate-600">${formatINR(bill.amount)} <span class="font-normal text-slate-400">• ${bill.category}</span></p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="toggleBillPaid('${bill.id}')" class="rounded-xl px-2.5 py-1.5 text-[11px] font-bold transition active:scale-95 ${isPaid ? 'bg-emerald-600 text-white' : 'border border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50'}">
+                ${isPaid ? '✓ Paid' : 'Mark Paid'}
+              </button>
+              <button type="button" onclick="deleteRecurringBill('${bill.id}')" aria-label="Delete bill" class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:bg-rose-50 hover:text-rose-500">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('billsSummaryText').textContent = `${paidCount} of ${state.recurringBills.length} paid in ${formatMonthLabel(state.activeMonth)}`;
+      document.getElementById('billsListContainer').innerHTML = billsHtml || `<p class="py-3 text-center text-xs text-slate-400">No recurring bills added yet.</p>`;
+
+      // Category Budget Caps
+      const totalCap = CATEGORIES.reduce((s, c) => s + (Number(state.budgets[c]) || 0), 0);
+      document.getElementById('totalBudgetCapBadge').textContent = `Total Cap: ${formatINR(totalCap)}`;
+
+      document.getElementById('budgetCapsContainer').innerHTML = CATEGORIES.map(cat => {
+        const cap = Number(state.budgets[cat]) || 0;
+        const spent = m.catTotals[cat] || 0;
+        const pct = cap > 0 ? Math.round((spent / cap) * 100) : (spent > 0 ? 100 : 0);
+        const barWidth = Math.min(100, pct);
+        const remaining = cap - spent;
+
+        let barColor = 'bg-emerald-500';
+        let statusText = `${formatINR(remaining)} left`;
+        let statusClass = 'text-emerald-700';
+
+        if (pct >= 100) {
+          barColor = 'bg-rose-600';
+          statusText = `Over by ${formatINR(Math.abs(remaining))}`;
+          statusClass = 'text-rose-600 font-bold';
+        } else if (pct >= 80) {
+          barColor = 'bg-amber-500';
+          statusText = `${formatINR(remaining)} left (${pct}%)`;
+          statusClass = 'text-amber-700 font-semibold';
+        }
+
+        return `
+          <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-800">${cat}</span>
+              <button type="button" onclick="editBudgetCap('${cat}')" class="rounded-lg bg-white px-2 py-0.5 text-[11px] font-bold text-slate-700 shadow-2xs ring-1 ring-slate-200 hover:ring-emerald-400">
+                Cap: ${formatINR(cap)} ✎
+              </button>
+            </div>
+            <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+              <div class="h-full rounded-full ${barColor} transition-all duration-300" style="width:${barWidth}%"></div>
+            </div>
+            <div class="mt-1.5 flex items-center justify-between text-[11px]">
+              <span class="text-slate-500">Spent: <strong class="text-slate-800">${formatINR(spent)}</strong></span>
+              <span class="${statusClass}">${statusText}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleBillPaid(billId) {
+      const bill = state.recurringBills.find(b => b.id === billId);
+      if (!bill) return;
+      if (!state.billPayments[state.activeMonth]) state.billPayments[state.activeMonth] = {};
+      const existingTxId = state.billPayments[state.activeMonth][billId];
+
+      if (existingTxId) {
+        // Unmark paid and remove linked expense to prevent stale entries
+        delete state.billPayments[state.activeMonth][billId];
+        state.transactions = state.transactions.filter(t => t.id !== existingTxId);
+        saveState();
+        renderBudgetTab();
+        showToast('Bill unmarked & expense removed');
+      } else {
+        const dayStr = String(Math.min(28, bill.dueDay || 1)).padStart(2, '0');
+        const txId = `tx_bill_${Date.now()}`;
+        state.transactions.unshift({
+          id: txId,
+          monthKey: state.activeMonth,
+          date: `${state.activeMonth}-${dayStr}`,
+          amount: bill.amount,
+          category: bill.category,
+          memberIdx: 0,
+          note: `${bill.name} (Bill)`,
+          paymentMode: 'Bank',
+          billId: bill.id
+        });
+        state.billPayments[state.activeMonth][billId] = txId;
+        saveState();
+        renderBudgetTab();
+        showToast(`${bill.name} marked paid & logged!`, 'success');
+      }
+    }
+
+    function deleteRecurringBill(billId) {
+      openConfirm('Delete Recurring Bill?', 'This removes the bill from future monthly checklists (past logged expenses remain).', () => {
+        state.recurringBills = state.recurringBills.filter(b => b.id !== billId);
+        saveState();
+        renderBudgetTab();
+        showToast('Recurring bill removed');
+      });
+    }
+
+    function editBudgetCap(category) {
+      openInputModal(
+        `Budget Cap: ${category}`,
+        'Set your monthly family spending limit (₹) for this category.',
+        state.budgets[category] || 0,
+        (val) => {
+          state.budgets[category] = val;
+          saveState();
+          renderBudgetTab();
+          showToast(`${category} cap updated!`, 'success');
+        }
+      );
+    }
+
+    const addBillForm = document.getElementById('addBillForm');
+    document.getElementById('toggleAddBillBtn').addEventListener('click', () => addBillForm.classList.toggle('hidden'));
+    document.getElementById('cancelBillFormBtn').addEventListener('click', () => addBillForm.classList.add('hidden'));
+    addBillForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('billName').value.trim();
+      const amount = Math.round(parseFloat(document.getElementById('billAmount').value) || 0);
+      const dueDay = Math.min(31, Math.max(1, parseInt(document.getElementById('billDueDay').value, 10) || 1));
+      const category = document.getElementById('billCategory').value;
+      if (!name || amount <= 0) return;
+
+      state.recurringBills.push({ id: 'bill_' + Date.now(), name, amount, dueDay, category });
+      saveState();
+      addBillForm.reset();
+      addBillForm.classList.add('hidden');
+      renderBudgetTab();
+      showToast('Recurring bill added!', 'success');
+    });
+
+    // ==================== TAB 3: EXPENSES & PRIVATE CSV IMPORT ====================
+    function renderExpensesTab() {
+      const search = document.getElementById('txSearch').value.trim().toLowerCase();
+      const memFilter = document.getElementById('filterMember').value;
+      const catFilter = document.getElementById('filterCategory').value;
+
+      const list = getMonthTransactions(state.activeMonth)
+        .filter(t => {
+          if (memFilter !== 'ALL' && String(t.memberIdx) !== memFilter) return false;
+          if (catFilter !== 'ALL' && t.category !== catFilter) return false;
+          if (search) {
+            const hay = `${t.note} ${t.category} ${t.paymentMode || ''} ${state.members[t.memberIdx] || ''}`.toLowerCase();
+            if (!hay.includes(search)) return false;
+          }
+          return true;
+        })
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      document.getElementById('txCountBadge').textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+      const container = document.getElementById('txListContainer');
+
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="rounded-3xl border border-dashed border-slate-200 bg-white p-7 text-center">
+            <p class="text-xs font-bold text-slate-600">No expenses logged for ${formatMonthLabel(state.activeMonth)}</p>
+            <p class="mt-1 text-[11px] text-slate-400">Tap "+ Add Expense" or import a bank statement CSV.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(t => {
+        const col = CATEGORY_COLORS[t.category] || '#64748b';
+        const memName = state.members[t.memberIdx] || 'Family';
+        return `
+          <div class="flex items-center justify-between gap-2.5 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-extrabold" style="background:${col}18; color:${col}">
+                ${t.category.slice(0, 2).toUpperCase()}
+              </div>
+              <div class="min-w-0">
+                <p class="truncate text-xs font-bold text-slate-900">${escapeHtml(t.note)}</p>
+                <div class="mt-0.5 flex flex-wrap items-center gap-1 text-[10px] font-medium text-slate-500">
+                  <span class="rounded bg-slate-100 px-1.5 py-0.5">${t.category}</span>
+                  <span>• ${escapeHtml(memName)}</span>
+                  <span>• ${t.paymentMode || 'UPI'}</span>
+                  <span>• ${t.date.slice(5)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-xs font-extrabold text-rose-600">-${formatINR(t.amount)}</span>
+              <button type="button" onclick="deleteTransaction('${t.id}')" aria-label="Delete" class="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:bg-rose-50 hover:text-rose-600">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function deleteTransaction(txId) {
+      const tx = state.transactions.find(t => t.id === txId);
+      if (tx && tx.billId && state.billPayments[tx.monthKey]) {
+        delete state.billPayments[tx.monthKey][tx.billId];
+      }
+      state.transactions = state.transactions.filter(t => t.id !== txId);
+      saveState();
+      renderExpensesTab();
+      showToast('Expense deleted');
+    }
+
+    const addTxForm = document.getElementById('addTxForm');
+    document.getElementById('toggleAddTxBtn').addEventListener('click', () => {
+      addTxForm.classList.toggle('hidden');
+      if (!addTxForm.classList.contains('hidden')) {
+        document.getElementById('txDate').value = `${state.activeMonth}-15`;
+        document.getElementById('txAmount').focus();
+      }
+    });
+    document.getElementById('closeAddTxBtn').addEventListener('click', () => addTxForm.classList.add('hidden'));
+
+    addTxForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const amount = Math.round(parseFloat(document.getElementById('txAmount').value) || 0);
+      const date = document.getElementById('txDate').value || `${state.activeMonth}-01`;
+      const monthKey = date.slice(0, 7);
+      const category = document.getElementById('txCategory').value;
+      const memberIdx = parseInt(document.getElementById('txMember').value, 10) || 0;
+      const note = document.getElementById('txNote').value.trim();
+      const paymentMode = document.getElementById('txMode').value;
+
+      if (amount <= 0 || !note) return;
+
+      state.transactions.unshift({
+        id: 'tx_' + Date.now(),
+        monthKey,
+        date,
+        amount,
+        category,
+        memberIdx,
+        note,
+        paymentMode
+      });
+      state.activeMonth = monthKey;
+      saveState();
+      addTxForm.reset();
+      addTxForm.classList.add('hidden');
+      refreshActiveTab();
+      showToast('Expense saved!', 'success');
+    });
+
+    ['txSearch', 'filterMember', 'filterCategory'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderExpensesTab);
+      document.getElementById(id).addEventListener('change', renderExpensesTab);
+    });
+
+    // Private On-Device Bank Statement CSV Parser
+    function autoCategorizeIndianTx(desc) {
+      const d = (desc || '').toLowerCase();
+      if (/(swiggy|zomato|dominos|starbucks|cafe|restaurant|netflix|hotstar|spotify|prime|dining)/.test(d)) return 'Dining & Subscriptions';
+      if (/(dmart|bigbasket|blinkit|zepto|instamart|grocery|supermarket|kirana|milk|fresh|reliance smart)/.test(d)) return 'Groceries';
+      if (/(bescom|tneb|tangedco|electricity|water|gas|lpg|indane|airtel|jio|vi |broadband|wifi|maid|maintenance)/.test(d)) return 'Utilities';
+      if (/(emi|loan|nach|ecs|mortgage|bajaj|hdfc loan|sbi home|credit card|cc bill)/.test(d)) return 'Loans & EMIs';
+      if (/(petrol|diesel|fuel|hpcl|bpcl|indianoil|iocl|fastag|uber|ola|rapido|metro|irctc|toll|auto)/.test(d)) return 'Transport';
+      if (/(pharmacy|apollo|medplus|1mg|hospital|clinic|doctor|diagnostic|insurance|lic|health)/.test(d)) return 'Medical & Insurance';
+      if (/(school|college|tuition|fee|udemy|books|education)/.test(d)) return 'Education';
+      return 'Shopping & Misc';
+    }
+
+    function parseCsvLine(line) {
+      const out = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') inQ = !inQ;
+        else if (ch === ',' && !inQ) { out.push(cur.trim()); cur = ''; }
+        else cur += ch;
+      }
+      out.push(cur.trim());
+      return out;
+    }
+
+    function normalizeDate(raw) {
+      const c = (raw || '').replace(/['"]/g, '').trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(c)) return c;
+      const dmy = c.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+      if (dmy) {
+        const yr = dmy[3].length === 2 ? '20' + dmy[3] : dmy[3];
+        return `${yr}-${dmy[2].padStart(2, '0')}-${dmy[1].padStart(2, '0')}`;
+      }
+      return `${state.activeMonth}-15`;
+    }
+
+    function handleCsvFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const lines = (ev.target.result || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+          if (lines.length < 2) return showToast('CSV file is empty', 'error');
+
+          let hIdx = 0;
+          for (let i = 0; i < Math.min(8, lines.length); i++) {
+            const lo = lines[i].toLowerCase();
+            if (lo.includes('date') && (lo.includes('debit') || lo.includes('withdraw') || lo.includes('amount') || lo.includes('narration') || lo.includes('description'))) {
+              hIdx = i;
+              break;
+            }
+          }
+
+          const headers = parseCsvLine(lines[hIdx]).map(h => h.toLowerCase());
+          const dateCol = headers.findIndex(h => h.includes('date'));
+          const descCol = headers.findIndex(h => h.includes('narrat') || h.includes('desc') || h.includes('partic') || h.includes('remark'));
+          const debitCol = headers.findIndex(h => h.includes('debit') || h.includes('withdraw') || h.includes('dr'));
+          const amountCol = headers.findIndex(h => h.includes('amount'));
+
+          let count = 0;
+          let lastMonthImported = state.activeMonth;
+
+          for (let i = hIdx + 1; i < lines.length; i++) {
+            const cols = parseCsvLine(lines[i]);
+            if (cols.length < 2) continue;
+            const rawAmtStr = debitCol >= 0 ? cols[debitCol] : (amountCol >= 0 ? cols[amountCol] : '');
+            const amt = Math.abs(parseFloat((rawAmtStr || '').replace(/[₹$,\s"]/g, '')) || 0);
+            if (amt <= 0) continue;
+
+            const dateStr = normalizeDate(dateCol >= 0 ? cols[dateCol] : cols[0]);
+            const mKey = dateStr.slice(0, 7);
+            const desc = (descCol >= 0 ? cols[descCol] : cols[1]) || 'Bank Debit';
+
+            state.transactions.unshift({
+              id: `csv_${Date.now()}_${i}`,
+              monthKey: mKey,
+              date: dateStr,
+              amount: Math.round(amt),
+              category: autoCategorizeIndianTx(desc),
+              memberIdx: 0,
+              note: desc.slice(0, 70),
+              paymentMode: desc.toLowerCase().includes('upi') ? 'UPI' : 'Bank'
+            });
+            lastMonthImported = mKey;
+            count++;
+          }
+
+          if (count > 0) {
+            state.activeMonth = lastMonthImported;
+            saveState();
+            refreshActiveTab();
+            showToast(`Imported ${count} expenses privately!`, 'success');
+          } else {
+            showToast('No debit rows found in CSV', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to parse CSV', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById('csvFileInput').addEventListener('change', (e) => {
+      handleCsvFile(e.target.files?.[0]);
+      e.target.value = '';
+    });
+
+    const dropZone = document.getElementById('csvDropZone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-emerald-100'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('bg-emerald-100'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('bg-emerald-100');
+      handleCsvFile(e.dataTransfer.files?.[0]);
+    });
+
+    document.getElementById('downloadSampleCsvBtn').addEventListener('click', () => {
+      const csv = [
+        'Date,Narration,Debit,Credit',
+        '18/11/2026,UPI/BLINKIT GROCERIES,1640,',
+        '19/11/2026,UPI/TNEB ELECTRICITY BILL,2950,',
+        '20/11/2026,SWIGGY FAMILY DINNER,1180,',
+        '21/11/2026,HPCL PETROL PUMP,2100,',
+        '22/11/2026,APOLLO PHARMACY,740,'
+      ].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sample_indian_statement.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Sample CSV downloaded');
+    });
+
+    // ==================== TAB 4: LOANS & DEBT FREEDOM ROADMAP ====================
+    function renderLoansTab() {
+      const loans = state.loans;
+      const totalP = loans.reduce((s, l) => s + (Number(l.principal) || 0), 0);
+      const totalEmi = loans.reduce((s, l) => s + (Number(l.emi) || 0), 0);
+      const weightedRate = totalP > 0 ? (loans.reduce((s, l) => s + l.principal * l.rate, 0) / totalP).toFixed(1) : '0.0';
+
+      document.getElementById('totalDebtPrincipal').textContent = formatINR(totalP);
+      document.getElementById('totalMonthlyEmi').textContent = formatINR(totalEmi);
+      document.getElementById('avgLoanRate').textContent = `Weighted avg: ${weightedRate}% p.a.`;
+      document.getElementById('activeLoansCount').textContent = `${loans.length} active loan${loans.length === 1 ? '' : 's'}`;
+
+      // #1 Debt Action Callout
+      const m = computeMonthMetrics(state.activeMonth);
+      const actionCard = document.getElementById('topDebtActionCard');
+      if (loans.length === 0) {
+        actionCard.classList.add('hidden');
+      } else {
+        actionCard.classList.remove('hidden');
+        const topRateLoan = [...loans].sort((a, b) => b.rate - a.rate)[0];
+        const suggestedExtra = Math.max(0, Math.min(m.surplus, topRateLoan.principal));
+        document.getElementById('topDebtActionText').innerHTML = suggestedExtra > 0
+          ? `Target <strong>${escapeHtml(topRateLoan.name)} (${topRateLoan.rate}% p.a.)</strong> first. Putting <strong>${formatINR(suggestedExtra)}</strong> of your current surplus toward its principal saves the maximum interest.`
+          : `Prioritize <strong>${escapeHtml(topRateLoan.name)} (${topRateLoan.rate}% p.a.)</strong>. Free up monthly surplus in your Budget tab to start prepaying it faster.`;
+      }
+
+      const listEl = document.getElementById('loansListContainer');
+      if (!loans.length) {
+        listEl.innerHTML = `<div class="rounded-3xl border border-dashed border-emerald-200 bg-white p-6 text-center text-xs font-bold text-emerald-700">Debt-Free Household! 🎉</div>`;
+      } else {
+        listEl.innerHTML = loans.map(l => `
+          <div class="flex items-center justify-between gap-2 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-2xs">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h4 class="truncate text-xs font-bold text-slate-900">${escapeHtml(l.name)}</h4>
+                <span class="rounded-md px-1.5 py-0.5 text-[10px] font-bold ${l.rate >= 12 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}">${l.rate}%</span>
+              </div>
+              <p class="mt-1 text-[11px] text-slate-500">Bal: <strong class="text-slate-900">${formatINR(l.principal)}</strong> • EMI: <strong class="text-rose-600">${formatINR(l.emi)}/mo</strong></p>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button type="button" onclick="editLoan('${l.id}')" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-emerald-50 hover:text-emerald-700">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+              <button type="button" onclick="deleteLoan('${l.id}')" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      updateLoanSimulator();
+    }
+
+    function simulateDebt(loansInput, extraMonthly, strategy) {
+      if (!loansInput.length) return { months: 0, totalInterest: 0, curve: [0] };
+
+      let active = loansInput.map(l => ({
+        bal: Number(l.principal) || 0,
+        r: (Number(l.rate) || 0) / 100 / 12,
+        emi: Number(l.emi) || 0
+      })).filter(l => l.bal > 0);
+
+      const totalBudget = active.reduce((s, l) => s + l.emi, 0) + (Number(extraMonthly) || 0);
+      const curve = [Math.round(active.reduce((s, l) => s + l.bal, 0))];
+      let months = 0, totalInterest = 0;
+      const MAX_M = 360;
+
+      while (active.some(l => l.bal > 1) && months < MAX_M) {
+        months++;
+        let leftover = strategy === 'baseline' ? 0 : totalBudget;
+
+        for (const l of active) {
+          if (l.bal <= 0) continue;
+          const intr = l.bal * l.r;
+          totalInterest += intr;
+          l.bal += intr;
+          const pay = Math.min(l.bal, l.emi);
+          l.bal -= pay;
+          if (strategy !== 'baseline') leftover -= pay;
+        }
+
+        if (strategy !== 'baseline' && leftover > 1) {
+          const targets = active.filter(l => l.bal > 1);
+          if (strategy === 'avalanche') targets.sort((a, b) => b.r - a.r);
+          else targets.sort((a, b) => a.bal - b.bal);
+          for (const t of targets) {
+            if (leftover <= 1) break;
+            const ex = Math.min(t.bal, leftover);
+            t.bal -= ex;
+            leftover -= ex;
+          }
+        }
+        curve.push(Math.max(0, Math.round(active.reduce((s, l) => s + l.bal, 0))));
+      }
+
+      return { months, totalInterest: Math.round(totalInterest), curve };
+    }
+
+    function targetMonthFromOffset(monthsOffset) {
+      return formatMonthLabel(shiftMonthKey(state.activeMonth, monthsOffset));
+    }
+
+    function updateLoanSimulator() {
+      const extra = parseInt(document.getElementById('extraPaymentSlider').value, 10) || 0;
+      document.getElementById('extraPaymentValue').textContent = formatINR(extra);
+
+      const container = document.getElementById('payoffComparisonContainer');
+      if (!state.loans.length) {
+        container.innerHTML = `<p class="text-center text-xs text-slate-400">Add loans to run the simulator.</p>`;
+        if (loanPayoffChart) { loanPayoffChart.destroy(); loanPayoffChart = null; }
+        return;
+      }
+
+      const base = simulateDebt(state.loans, 0, 'baseline');
+      const aval = simulateDebt(state.loans, extra, 'avalanche');
+      const snow = simulateDebt(state.loans, extra, 'snowball');
+
+      const avalSaved = Math.max(0, base.totalInterest - aval.totalInterest);
+      const avalMosSaved = Math.max(0, base.months - aval.months);
+      const snowSaved = Math.max(0, base.totalInterest - snow.totalInterest);
+      const snowMosSaved = Math.max(0, base.months - snow.months);
+
+      container.innerHTML = `
+        <div class="rounded-2xl border border-emerald-300 bg-emerald-50/50 p-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-900">Debt Avalanche <span class="ml-1 rounded bg-emerald-600 px-1.5 py-0.5 text-[9px] text-white">BEST</span></span>
+            <span class="text-xs font-extrabold text-emerald-700">Free by ${targetMonthFromOffset(aval.months)}</span>
+          </div>
+          <div class="mt-1.5 flex items-center justify-between text-[11px] text-slate-600">
+            <span>Months Saved: <strong class="text-slate-900">${avalMosSaved} mos</strong></span>
+            <span>Interest Saved: <strong class="text-emerald-700">${formatINR(avalSaved)}</strong></span>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-900">Debt Snowball <span class="ml-1 rounded bg-slate-200 px-1.5 py-0.5 text-[9px] text-slate-700">QUICK WINS</span></span>
+            <span class="text-xs font-extrabold text-slate-700">Free by ${targetMonthFromOffset(snow.months)}</span>
+          </div>
+          <div class="mt-1.5 flex items-center justify-between text-[11px] text-slate-600">
+            <span>Months Saved: <strong class="text-slate-900">${snowMosSaved} mos</strong></span>
+            <span>Interest Saved: <strong class="text-emerald-700">${formatINR(snowSaved)}</strong></span>
+          </div>
+        </div>
+      `;
+
+      // Render Balance Payoff Curve (sample every 6 months or 12 months for clean mobile x-axis)
+      const maxLen = Math.max(base.curve.length, aval.curve.length);
+      const step = Math.max(1, Math.ceil(maxLen / 18));
+      const labels = [], basePts = [], avalPts = [], snowPts = [];
+      for (let i = 0; i < maxLen; i += step) {
+        labels.push(`Yr ${(i / 12).toFixed(1)}`);
+        basePts.push(base.curve[i] ?? 0);
+        avalPts.push(aval.curve[i] ?? 0);
+        snowPts.push(snow.curve[i] ?? 0);
+      }
+
+      const ctx = document.getElementById('loanPayoffChart').getContext('2d');
+      if (loanPayoffChart) loanPayoffChart.destroy();
+      loanPayoffChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Current EMIs', data: basePts, borderColor: '#94a3b8', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.25 },
+            { label: 'Avalanche', data: avalPts, borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.08)', fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.25 },
+            { label: 'Snowball', data: snowPts, borderColor: '#d97706', borderWidth: 1.8, pointRadius: 0, tension: 0.25 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+            tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}: ${formatINR(c.raw)}` } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 6, font: { size: 9 } } },
+            y: {
+              grid: { color: '#f1f5f9' },
+              ticks: {
+                font: { size: 9 },
+                callback: (v) => v >= 100000 ? `₹${(v / 100000).toFixed(1)}L` : `₹${Math.round(v / 1000)}k`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    document.getElementById('extraPaymentSlider').addEventListener('input', updateLoanSimulator);
+
+    const loanForm = document.getElementById('loanForm');
+    document.getElementById('toggleAddLoanBtn').addEventListener('click', () => {
+      document.getElementById('editLoanId').value = '';
+      document.getElementById('loanFormTitle').textContent = 'Add New Loan';
+      loanForm.reset();
+      loanForm.classList.toggle('hidden');
+    });
+    document.getElementById('cancelLoanFormBtn').addEventListener('click', () => loanForm.classList.add('hidden'));
+
+    function editLoan(id) {
+      const l = state.loans.find(x => x.id === id);
+      if (!l) return;
+      document.getElementById('editLoanId').value = l.id;
+      document.getElementById('loanFormTitle').textContent = 'Edit Loan';
+      document.getElementById('loanName').value = l.name;
+      document.getElementById('loanPrincipal').value = l.principal;
+      document.getElementById('loanRate').value = l.rate;
+      document.getElementById('loanEmi').value = l.emi;
+      loanForm.classList.remove('hidden');
+    }
+
+    function deleteLoan(id) {
+      openConfirm('Delete Loan?', 'Remove this loan from your family roadmap?', () => {
+        state.loans = state.loans.filter(l => l.id !== id);
+        saveState();
+        renderLoansTab();
+        showToast('Loan deleted');
+      });
+    }
+
+    loanForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const editId = document.getElementById('editLoanId').value;
+      const name = document.getElementById('loanName').value.trim();
+      const principal = Math.round(parseFloat(document.getElementById('loanPrincipal').value) || 0);
+      const rate = parseFloat(document.getElementById('loanRate').value) || 0;
+      const emi = Math.round(parseFloat(document.getElementById('loanEmi').value) || 0);
+      if (!name || principal <= 0 || emi <= 0) return;
+
+      if (editId) {
+        const idx = state.loans.findIndex(l => l.id === editId);
+        if (idx >= 0) state.loans[idx] = { id: editId, name, principal, rate, emi };
+        showToast('Loan updated!', 'success');
+      } else {
+        state.loans.push({ id: 'loan_' + Date.now(), name, principal, rate, emi });
+        showToast('Loan added!', 'success');
+      }
+      saveState();
+      loanForm.reset();
+      loanForm.classList.add('hidden');
+      renderLoansTab();
+    });
+
+    // ==================== TAB 5: PLAN & GOALS ====================
+    function renderPlanTab() {
+      const m = computeMonthMetrics(state.activeMonth);
+      const efSaved = Number(state.emergencyFundSaved) || 0;
+      const efPct = Math.min(100, Math.round((efSaved / m.efTarget) * 100));
+
+      document.getElementById('efSavedAmount').textContent = formatINR(efSaved);
+      document.getElementById('efTargetAmount').textContent = formatINR(m.efTarget);
+      document.getElementById('efPercentBadge').textContent = `${efPct}%`;
+      document.getElementById('efProgressBar').style.width = `${efPct}%`;
+
+      // Render Custom Goals
+      const container = document.getElementById('goalsListContainer');
+      if (!state.goals.length) {
+        container.innerHTML = `<p class="py-3 text-center text-xs text-slate-400">Add your first family milestone above.</p>`;
+      } else {
+        container.innerHTML = state.goals.map(g => {
+          const pct = g.target > 0 ? Math.min(100, Math.round((g.saved / g.target) * 100)) : 0;
+          return `
+            <div class="rounded-2xl border border-slate-200/80 bg-slate-50/60 p-3">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="text-xs font-bold text-slate-900">${escapeHtml(g.name)}</h4>
+                  <p class="text-[10px] text-slate-500">Target Date: ${g.targetDate ? formatMonthLabel(g.targetDate) : 'Flexible'}</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-extrabold text-emerald-700">${pct}%</span>
+                  <button type="button" onclick="deleteGoal('${g.id}')" aria-label="Delete goal" class="text-slate-300 hover:text-rose-500">
+                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                <div class="h-full rounded-full bg-emerald-600 transition-all duration-300" style="width:${pct}%"></div>
+              </div>
+              <div class="mt-2 flex items-center justify-between text-[11px]">
+                <span class="text-slate-600"><strong>${formatINR(g.saved)}</strong> / ${formatINR(g.target)}</span>
+                <button type="button" onclick="contributeGoal('${g.id}')" class="rounded-lg bg-emerald-600 px-2.5 py-1 text-[10px] font-bold text-white hover:bg-emerald-700 active:scale-95">+ Add ₹</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function contributeEmergencyFund(delta) {
+      state.emergencyFundSaved = Math.max(0, (Number(state.emergencyFundSaved) || 0) + delta);
+      saveState();
+      renderPlanTab();
+      showToast(`Added ${formatINR(delta)} to Emergency Fund!`, 'success');
+    }
+
+    document.getElementById('editEfCustomBtn').addEventListener('click', () => {
+      openInputModal('Set Emergency Fund Balance', 'Enter total amount (₹) currently saved in your family emergency fund.', state.emergencyFundSaved || 0, (val) => {
+        state.emergencyFundSaved = val;
+        saveState();
+        renderPlanTab();
+        showToast('Emergency fund updated!', 'success');
+      });
+    });
+
+    function contributeGoal(goalId) {
+      const g = state.goals.find(x => x.id === goalId);
+      if (!g) return;
+      openInputModal(`Add to ${g.name}`, 'Enter contribution amount (₹) to add to this goal.', 5000, (val) => {
+        g.saved = (Number(g.saved) || 0) + val;
+        saveState();
+        renderPlanTab();
+        showToast(`Added ${formatINR(val)} to ${g.name}!`, 'success');
+      });
+    }
+
+    function deleteGoal(goalId) {
+      openConfirm('Delete Goal?', 'Remove this family goal?', () => {
+        state.goals = state.goals.filter(g => g.id !== goalId);
+        saveState();
+        renderPlanTab();
+        showToast('Goal removed');
+      });
+    }
+
+    const addGoalForm = document.getElementById('addGoalForm');
+    document.getElementById('toggleAddGoalBtn').addEventListener('click', () => addGoalForm.classList.toggle('hidden'));
+    document.getElementById('cancelGoalFormBtn').addEventListener('click', () => addGoalForm.classList.add('hidden'));
+    addGoalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('goalName').value.trim();
+      const target = Math.round(parseFloat(document.getElementById('goalTarget').value) || 0);
+      const saved = Math.round(parseFloat(document.getElementById('goalSaved').value) || 0);
+      const targetDate = document.getElementById('goalDate').value;
+      if (!name || target <= 0) return;
+
+      state.goals.push({ id: 'goal_' + Date.now(), name, target, saved, targetDate });
+      saveState();
+      addGoalForm.reset();
+      addGoalForm.classList.add('hidden');
+      renderPlanTab();
+      showToast('Family goal added!', 'success');
+    });
+
+    // Weekly WhatsApp Family Summary & Redacted AI Audit Prompt
+    document.getElementById('copyWhatsappBtn').addEventListener('click', () => {
+      const m = computeMonthMetrics(state.activeMonth);
+      const unpaidBills = state.recurringBills.filter(b => !(state.billPayments[state.activeMonth] && state.billPayments[state.activeMonth][b.id]));
+      const totalDebt = state.loans.reduce((s, l) => s + l.principal, 0);
+
+      const summary = [
+        `📊 *ParivarVault Family Finance Update — ${formatMonthLabel(state.activeMonth)}*`,
+        `⭐ *Health Score:* ${m.healthScore}/100`,
+        ``,
+        `💰 *Take-Home Income:* ${formatINR(m.income)}`,
+        `💸 *Spent & EMIs:* ${formatINR(m.totalSpent)}`,
+        `✅ *Remaining Surplus:* ${formatINR(m.surplus)} (${m.savingsRate}% saved)`,
+        ``,
+        `🧾 *Unpaid Bills:* ${unpaidBills.length ? unpaidBills.map(b => `${b.name} (${formatINR(b.amount)})`).join(', ') : 'All bills paid! 🎉'}`,
+        `🏦 *Active Debt Balance:* ${formatINR(totalDebt)} (EMIs: ${m.emiRatio}% of income)`,
+        `🛡️ *Emergency Fund:* ${formatINR(state.emergencyFundSaved)} / ${formatINR(m.efTarget)} (${Math.round(m.efRatio * 100)}%)`
+      ].join('\n');
+
+      copyTextToClipboard(summary, 'WhatsApp summary copied!');
+    });
+
+    document.getElementById('copyAiPromptBtn').addEventListener('click', () => {
+      const m = computeMonthMetrics(state.activeMonth);
+      const catLines = CATEGORIES.map(c => `- ${c}: Spent ${formatINR(m.catTotals[c])} / Cap ${formatINR(state.budgets[c] || 0)}`).join('\n');
+      const loanLines = state.loans.map(l => `- ${l.name}: Bal ${formatINR(l.principal)} @ ${l.rate}% p.a., EMI ${formatINR(l.emi)}/mo`).join('\n');
+
+      const prompt = `Act as a Chartered Accountant for my Indian family of 4. Here is our redacted financial snapshot for ${formatMonthLabel(state.activeMonth)} (no personal identifiers):
+
+Monthly Take-Home Income: ${formatINR(m.income)}
+Total Spent & EMIs: ${formatINR(m.totalSpent)}
+Monthly Surplus: ${formatINR(m.surplus)} (Savings Rate: ${m.savingsRate}%)
+Emergency Fund: ${formatINR(state.emergencyFundSaved)} / ${formatINR(m.efTarget)}
+
+Category Breakdown:
+${catLines}
+
+Active Loans:
+${loanLines || '- None'}
+
+Please give us:
+1. Top 3 specific budget cuts for next month.
+2. Our exact debt prepayment order for the next 6 months.
+3. How to split our monthly surplus between Emergency Fund, Loan Prepayment, and SIPs.`;
+
+      copyTextToClipboard(prompt, 'Redacted AI Audit prompt copied!');
+    });
+
+    // ==================== SETTINGS, PIN LOCK & JSON SYNC ====================
+    function openSettingsModal() {
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`memberInput${i}`).value = state.members[i] || `Member ${i + 1}`;
+      }
+      updatePinSettingsUI();
+      const modal = document.getElementById('settingsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.getElementById('setPinForm').classList.add('hidden');
+    }
+
+    document.getElementById('openSettingsBtn').addEventListener('click', openSettingsModal);
+    document.getElementById('closeSettingsBtn').addEventListener('click', closeSettingsModal);
+    document.getElementById('settingsModal').addEventListener('click', (e) => {
+      if (e.target.id === 'settingsModal') closeSettingsModal();
+    });
+
+    document.getElementById('settingsMembersForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.members = [0, 1, 2, 3].map(i => document.getElementById(`memberInput${i}`).value.trim() || `Member ${i + 1}`);
+      saveState();
+      refreshActiveTab();
+      showToast('Family member names saved!', 'success');
+    });
+
+    // PIN Lock System
+    let enteredPin = '';
+    function updatePinSettingsUI() {
+      const enabled = state.pin && state.pin.enabled && state.pin.code.length === 4;
+      document.getElementById('pinStatusText').textContent = enabled ? 'Active — App locks on open' : 'Currently disabled';
+      document.getElementById('togglePinBtn').textContent = enabled ? 'Disable PIN' : 'Enable PIN';
+    }
+
+    document.getElementById('togglePinBtn').addEventListener('click', () => {
+      if (state.pin && state.pin.enabled) {
+        state.pin = { enabled: false, code: '' };
+        saveState();
+        updatePinSettingsUI();
+        showToast('PIN Lock disabled');
+      } else {
+        const f = document.getElementById('setPinForm');
+        f.classList.toggle('hidden');
+        f.classList.toggle('flex');
+        document.getElementById('newPinInput').focus();
+      }
+    });
+
+    document.getElementById('setPinForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = document.getElementById('newPinInput').value.trim();
+      if (!/^\d{4}$/.test(code)) return showToast('Enter exactly 4 digits', 'error');
+      state.pin = { enabled: true, code };
+      saveState();
+      document.getElementById('newPinInput').value = '';
+      document.getElementById('setPinForm').classList.add('hidden');
+      document.getElementById('setPinForm').classList.remove('flex');
+      updatePinSettingsUI();
+      showToast('4-digit PIN enabled!', 'success');
+    });
+
+    function showPinOverlay() {
+      enteredPin = '';
+      renderPinDots();
+      document.getElementById('pinErrorMsg').textContent = 'Enter your 4-digit family PIN';
+      document.getElementById('pinErrorMsg').className = 'mt-1 h-4 text-xs font-medium text-slate-400';
+      const ov = document.getElementById('pinLockOverlay');
+      ov.classList.remove('hidden');
+      ov.classList.add('flex');
+    }
+
+    function hidePinOverlay() {
+      const ov = document.getElementById('pinLockOverlay');
+      ov.classList.add('hidden');
+      ov.classList.remove('flex');
+    }
+
+    function renderPinDots() {
+      document.querySelectorAll('.pin-dot').forEach((dot, i) => {
+        const filled = i < enteredPin.length;
+        dot.classList.toggle('bg-emerald-500', filled);
+        dot.classList.toggle('border-emerald-500', filled);
+        dot.classList.toggle('border-slate-500', !filled);
+      });
+    }
+
+    document.querySelectorAll('.pin-key').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (enteredPin.length >= 4) return;
+        enteredPin += btn.dataset.pin;
+        renderPinDots();
+        if (enteredPin.length === 4) {
+          if (enteredPin === state.pin.code) {
+            hidePinOverlay();
+          } else {
+            document.getElementById('pinErrorMsg').textContent = 'Incorrect PIN — try again';
+            document.getElementById('pinErrorMsg').className = 'mt-1 h-4 text-xs font-bold text-rose-400';
+            setTimeout(() => { enteredPin = ''; renderPinDots(); }, 350);
+          }
+        }
+      });
+    });
+
+    document.getElementById('pinClearBtn').addEventListener('click', () => { enteredPin = ''; renderPinDots(); });
+    document.getElementById('pinBackBtn').addEventListener('click', () => { enteredPin = enteredPin.slice(0, -1); renderPinDots(); });
+
+    document.getElementById('quickLockBtn').addEventListener('click', () => {
+      if (state.pin && state.pin.enabled && state.pin.code.length === 4) {
+        showPinOverlay();
+      } else {
+        openSettingsModal();
+        showToast('Enable a 4-digit PIN in Settings first');
+      }
+    });
+
+    // Export & Import JSON Backup
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `parivarvault-pro-backup-${state.activeMonth}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Family backup JSON exported!', 'success');
+    });
+
+    document.getElementById('importJsonInput').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && Array.isArray(parsed.members) && Array.isArray(parsed.transactions)) {
+            state = parsed;
+            saveState();
+            closeSettingsModal();
+            refreshActiveTab();
+            showToast('Family backup restored!', 'success');
+          } else {
+            showToast('Invalid ParivarVault backup file', 'error');
+          }
+        } catch (err) {
+          showToast('Could not parse JSON file', 'error');
+        }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    // Reset & Clear All
+    document.getElementById('resetSampleBtn').addEventListener('click', () => {
+      openConfirm('Reset to Sample Data?', 'This restores the realistic 3-month family of 4 dataset.', () => {
+        state = createSampleData();
+        saveState();
+        closeSettingsModal();
+        refreshActiveTab();
+        showToast('Sample data restored!', 'success');
+      });
+    });
+
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      openConfirm('Clear All Data (Start Fresh)?', 'Removes all transactions, loans, bills, and goals so you can start with ₹0.', () => {
+        state = {
+          activeMonth: TODAY_MONTH_KEY,
+          defaultIncome: 0,
+          monthIncomes: {},
+          members: ['Member 1', 'Member 2', 'Member 3', 'Member 4'],
+          budgets: Object.fromEntries(CATEGORIES.map(c => [c, 0])),
+          recurringBills: [],
+          billPayments: {},
+          transactions: [],
+          loans: [],
+          emergencyFundSaved: 0,
+          goals: [],
+          pin: { enabled: false, code: '' }
+        };
+        saveState();
+        closeSettingsModal();
+        refreshActiveTab();
+        showToast('All data cleared');
+      });
+    });
+
+    // ==================== INITIALIZE APP ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      if (state.pin && state.pin.enabled && state.pin.code.length === 4) {
+        showPinOverlay();
+      }
+      switchTab('overview');
+    });
+  </script>
+</body>
+</html>
